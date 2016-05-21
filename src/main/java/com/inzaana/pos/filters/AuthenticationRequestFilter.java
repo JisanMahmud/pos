@@ -11,14 +11,11 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 
 import org.glassfish.jersey.internal.util.Base64;
 
-import com.inzaana.pos.db.DBConnector;
 import com.inzaana.pos.managers.UserManager;
 import com.inzaana.pos.models.User;
 import com.inzaana.pos.utils.InzaanaSecurityContext;
