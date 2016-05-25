@@ -167,45 +167,44 @@ public class Category
 		ArrayList<String> paramList = new ArrayList<>();
 		paramList.add(userID);
 
-		return dbManager.ExecuteUpdate(sqlQuery, paramList);
+		return dbManager.executeUpdate(sqlQuery, paramList);
 	}
 
 	public boolean updateRecordInDB(String userID)
 	{
-		// String sqlQuery = "UPDATE " + DBTables.CATEGORY.toString() + " SET ";
-		//
-		// for (int i = 0; i < categoryTableStringList.size(); i++)
-		// {
-		// sqlQuery += categoryTableStringList.get(i).getFirst() + "='" +
-		// categoryTableStringList.get(i).getSecond()
-		// + "'";
-		//
-		// if (i < (categoryTableStringList.size() - 1))
-		// {
-		// sqlQuery += ", ";
-		// }
-		// }
-		//
-		// for (int i = 0; i < categoryTableIntegerList.size(); i++)
-		// {
-		// sqlQuery += ", " + categoryTableIntegerList.get(i).getFirst() + "="
-		// + categoryTableIntegerList.get(i).getSecond().toString() + "";
-		// }
-		//
-		// sqlQuery += " WHERE USERID='" + userID + "' AND " + ID + "='" + id +
-		// "';";
-		//
-		// DBManager dbManager = new DBManager();
-		//
-		// if (!dbManager.validateUserID(userID))
-		// {
-		// return false;
-		// }
-		//
-		// ArrayList<String> paramList = new ArrayList<>();
-		// paramList.add(userID);
-		//
-		// return dbManager.ExecuteUpdate(sqlQuery, paramList);
-		return false;
+
+		String sqlQuery = "UPDATE " + DBTables.CATEGORIES.toString() + " SET ";
+
+		for (int i = 0; i < categoryTableStringList.size(); i++)
+		{
+			sqlQuery += categoryTableStringList.get(i).getFirst() + "=";
+			sqlQuery += "'" + categoryTableStringList.get(i).getSecond() + "'";
+
+			if (i < (categoryTableStringList.size() - 1))
+			{
+				sqlQuery += ", ";
+			}
+		}
+
+		for (int i = 0; i < categoryTableIntegerList.size(); i++)
+		{
+			sqlQuery += ", " + categoryTableIntegerList.get(i).getFirst() + "=";
+			sqlQuery += categoryTableIntegerList.get(i).getSecond().toString();
+		}
+
+		sqlQuery += " WHERE " + USER_ID + "=? AND " + NAME + "=?;";
+
+		DBManager dbManager = new DBManager();
+
+		if (!dbManager.validateUserID(userID))
+		{
+			return false;
+		}
+
+		ArrayList<String> paramList = new ArrayList<>();
+		paramList.add(userID);
+		paramList.add(name);
+
+		return dbManager.executeUpdate(sqlQuery, paramList);
 	}
 }

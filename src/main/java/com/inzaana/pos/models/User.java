@@ -105,7 +105,7 @@ public class User implements Principal
 			return false;
 		}
 
-		return dbManager.ExecuteUpdate(sqlQuery, new ArrayList<String>());
+		return dbManager.executeUpdate(sqlQuery, new ArrayList<String>());
 	}
 
 	public boolean updateRecordInDB(String userID)

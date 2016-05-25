@@ -63,7 +63,12 @@ public class CategoryResource
 	public String updateCategory(@PathParam("userName") String userName,
 			@PathParam("categoryName") String categoryName, Category updatedCategory)
 	{
-		return categoryManager.updateCategory(userName, categoryName, updatedCategory);
+		if (!categoryManager.updateCategory(userName, categoryName, updatedCategory))
+		{
+			return FAILURE_MSG;
+		}
+
+		return SUCCESS_MSG;
 	}
 
 	@DELETE

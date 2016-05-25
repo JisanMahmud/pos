@@ -19,6 +19,11 @@ public class ProductManager
 
 	public List<Product> getProducts(String userName)
 	{
+		if (!dbManager.validateUserName(userName))
+		{
+			return new ArrayList<Product>();
+		}
+
 		return dbManager.getProducts(userName);
 	}
 
@@ -29,12 +34,22 @@ public class ProductManager
 
 	public boolean addNewProduct(String userName, Product newProduct)
 	{
+		if (!dbManager.validateUserName(userName))
+		{
+			return false;
+		}
+
 		return newProduct.insertRecordIntoDB(userName);
 	}
 
 	public boolean updateProduct(String userName, String productName, Product updatedProduct)
 	{
-		return false;
+		if (!dbManager.validateUserName(userName))
+		{
+			return false;
+		}
+
+		return updatedProduct.updateRecordInDB(userName);
 	}
 
 	public boolean deleteProduct(String userName, String productName)
@@ -51,7 +66,7 @@ public class ProductManager
 		paramList.add(userName);
 		paramList.add(productName);
 
-		return dbManager.ExecuteUpdate(sqlQuery, paramList);
+		return dbManager.executeUpdate(sqlQuery, paramList);
 	}
 
 }

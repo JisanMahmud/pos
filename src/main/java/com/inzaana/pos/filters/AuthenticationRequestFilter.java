@@ -30,8 +30,14 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter
 	@Context
 	private ResourceInfo		resourceInfo;
 
-	private static final String	AUTHORIZATION_PROPERTY	= "Authorization";
-	private static final String	AUTHENTICATION_SCHEME	= "Basic";
+	public static String		USER_NAME					= "***@@@***DEFAULT_USER_NAME***@@@***";
+	public static String		USER_ROLE					= UserRole.GUEST.toString();
+
+	private static final String	AUTHORIZATION_PROPERTY		= "Authorization";
+	private static final String	AUTHENTICATION_SCHEME		= "Basic";
+	private static final String	ACCESS_UNAUTHORIZED			= "ACCESS UNAUTHORIZED : ";
+	private static final String	AUTH_NOT_FOUND				= "AUTHENTICATION INFORMATION NOT FOUND";
+	private static final String	BLANK_USER_NAME_PASSWORD	= "USER NAME OR PASSWORD CANN'T BE BLANK";
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException
@@ -42,45 +48,61 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter
 		// If no authorization information present; block access
 		if (authorization == null || authorization.isEmpty())
 		{
-			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity("Access Unauthorized")
-					.build());
+			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+					.entity(ACCESS_UNAUTHORIZED + AUTH_NOT_FOUND).build());
 			return;
 		}
 
 		final String encodedUserPassword = authorization.get(0).replaceFirst(AUTHENTICATION_SCHEME + " ", "");
 
-		String usernameAndPassword = new String(Base64.decode(encodedUserPassword.getBytes()));
+		String userNameAndPassword = new String(Base64.decode(encodedUserPassword.getBytes()));
 
-		final StringTokenizer tokenizer = new StringTokenizer(usernameAndPassword, ":");
-		final String userName = tokenizer.nextToken();
-		final String password = tokenizer.nextToken();
-
-		if (userName.isEmpty())
+		if (userNameAndPassword == null || userNameAndPassword.replace(":", "").trim().isEmpty())
 		{
-			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).entity("User name can not be Empty")
-					.build());
+			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+					.entity(ACCESS_UNAUTHORIZED + AUTH_NOT_FOUND).build());
 			return;
 		}
 
-		UserManager userManager = new UserManager();
-		String origPassword = userManager.getUserPassword(userName);
-		if (!password.equals(origPassword))
+		final String[] credentials = userNameAndPassword.split(":");
+
+		if (credentials.length != 2)
 		{
 			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-					.entity("Password Missmatch : " + origPassword + " : " + password).build());
+					.entity(ACCESS_UNAUTHORIZED + BLANK_USER_NAME_PASSWORD).build());
+			return;
+		}
+		else if (credentials[0].trim().isEmpty() || credentials[1].trim().isEmpty())
+		{
+			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+					.entity(ACCESS_UNAUTHORIZED + BLANK_USER_NAME_PASSWORD).build());
+			return;
+		}
+
+		String userName = credentials[0];
+		USER_NAME = userName;
+		String userPassword = credentials[1];
+
+		UserManager userManager = new UserManager();
+		String savedPassword = userManager.getUserPassword(userName);
+		if (!userPassword.equals(savedPassword))
+		{
+			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+					.entity("Password Missmatch : " + savedPassword + " : " + userPassword).build());
 			return;
 		}
 
 		String userRole = userManager.getUserRole(userName);
+		USER_ROLE = userRole;
 		if (userRole.equals(UserRole.GUEST.toString()))
 		{
-			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).entity("GUEST User role not allowed.")
+			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).entity("GUEST USER ROLE NOT ALLOWED")
 					.build());
 			return;
 		}
 
 		String scheme = requestContext.getUriInfo().getRequestUri().getScheme();
-		User user = new User(userName, origPassword, userRole);
+		User user = new User(userName, savedPassword, userRole);
 		requestContext.setSecurityContext(new InzaanaSecurityContext(user, scheme));
 	}
 }

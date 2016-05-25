@@ -490,12 +490,58 @@ public class Product
 		ArrayList<String> paramList = new ArrayList<>();
 		paramList.add(userID);
 
-		return dbManager.ExecuteUpdate(sqlQuery, paramList);
+		return dbManager.executeUpdate(sqlQuery, paramList);
 	}
 
 	public boolean updateRecordInDB(String userID)
 	{
-		return false;
+
+		String sqlQuery = "UPDATE " + DBTables.PRODUCTS.toString() + " SET ";
+
+		for (int i = 0; i < productTableStringList.size(); i++)
+		{
+			sqlQuery += productTableStringList.get(i).getFirst() + "=";
+			sqlQuery += "'" + productTableStringList.get(i).getSecond() + "'";
+
+			if (i < (productTableStringList.size() - 1))
+			{
+				sqlQuery += ", ";
+			}
+		}
+
+		for (int i = 0; i < productTableIntegerList.size(); i++)
+		{
+			sqlQuery += ", " + productTableIntegerList.get(i).getFirst() + "=";
+			sqlQuery += productTableIntegerList.get(i).getSecond().toString();
+		}
+
+		for (int i = 0; i < productTableDoubleList.size(); i++)
+		{
+			sqlQuery += ", " + productTableDoubleList.get(i).getFirst() + "=";
+			sqlQuery += productTableDoubleList.get(i).getSecond().toString();
+		}
+
+		for (int i = 0; i < productTableBooleanList.size(); i++)
+		{
+			sqlQuery += ", " + productTableBooleanList.get(i).getFirst() + "=";
+			Integer intValueOfBoolean = productTableBooleanList.get(i).getSecond() ? 1 : 0;
+			sqlQuery += intValueOfBoolean.toString();
+		}
+
+		sqlQuery += " WHERE " + USER_ID + "=? AND " + NAME + "=?;";
+
+		DBManager dbManager = new DBManager();
+
+		if (!dbManager.validateUserID(userID))
+		{
+			return false;
+		}
+
+		ArrayList<String> paramList = new ArrayList<>();
+		paramList.add(userID);
+		paramList.add(name);
+
+		return dbManager.executeUpdate(sqlQuery, paramList);
 	}
 
 }

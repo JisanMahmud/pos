@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.PreparedStatement;
 
+import com.inzaana.pos.filters.AuthenticationRequestFilter;
 import com.inzaana.pos.models.Category;
 import com.inzaana.pos.models.Payment;
 import com.inzaana.pos.models.Product;
@@ -35,7 +36,7 @@ public class DBManager
 	{
 	}
 
-	public boolean ExecuteUpdate(String sqlQuery, ArrayList<String> paramList)
+	public boolean executeUpdate(String sqlQuery, ArrayList<String> paramList)
 	{
 		boolean success = true;
 
@@ -51,6 +52,7 @@ public class DBManager
 				preparedStatement.setString(i + 1, paramList.get(i));
 			}
 
+			System.out.println(sqlQuery + paramList.toString());
 			preparedStatement.executeUpdate();
 		}
 		catch (SQLException se)
@@ -71,18 +73,18 @@ public class DBManager
 		return success;
 	}
 
-	public List<Category> getCategoryItems(String userId)
+	public List<Category> getCategoryItems(String userName)
 	{
 		List<Category> categoryList = new ArrayList<Category>();
 
-		if (!validateUserID(userId))
+		if (!validateUserName(userName))
 		{
 			return categoryList;
 		}
 
 		String sqlQuery = "SELECT * FROM " + DBTables.CATEGORIES.toString();
 
-		if (!userId.isEmpty())
+		if (!userName.isEmpty())
 		{
 			sqlQuery += " WHERE USER_ID = ?";
 		}
@@ -94,9 +96,9 @@ public class DBManager
 			dbConnection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASS);
 			preparedStatement = dbConnection.prepareStatement(sqlQuery);
 
-			if (!userId.isEmpty())
+			if (!userName.isEmpty())
 			{
-				preparedStatement.setString(1, userId);
+				preparedStatement.setString(1, userName);
 			}
 
 			resultSet = preparedStatement.executeQuery();
@@ -209,18 +211,18 @@ public class DBManager
 		return productList;
 	}
 
-	public List<Payment> getPaymentItems(String userID)
+	public List<Payment> getPaymentItems(String userName)
 	{
 		List<Payment> paymentList = new ArrayList<Payment>();
 
-		if (!validateUserID(userID))
+		if (!validateUserName(userName))
 		{
 			return paymentList;
 		}
 
 		String sqlQuery = "SELECT * FROM " + DBTables.PAYMENTS.toString();
 
-		if (!userID.isEmpty())
+		if (!userName.isEmpty())
 		{
 			sqlQuery += " WHERE USER_ID = ?";
 		}
@@ -232,9 +234,9 @@ public class DBManager
 			dbConnection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASS);
 			preparedStatement = dbConnection.prepareStatement(sqlQuery);
 
-			if (!userID.isEmpty())
+			if (!userName.isEmpty())
 			{
-				preparedStatement.setString(1, userID);
+				preparedStatement.setString(1, userName);
 			}
 
 			resultSet = preparedStatement.executeQuery();
@@ -261,18 +263,18 @@ public class DBManager
 		return paymentList;
 	}
 
-	public List<StockDiary> getStockDiaryItems(String userID)
+	public List<StockDiary> getStockDiaryItems(String userName)
 	{
 		List<StockDiary> stockList = new ArrayList<StockDiary>();
 
-		if (!validateUserID(userID))
+		if (!validateUserName(userName))
 		{
 			return stockList;
 		}
 
 		String sqlQuery = "SELECT * FROM " + DBTables.PRODUCTS.toString();
 
-		if (!userID.isEmpty())
+		if (!userName.isEmpty())
 		{
 			sqlQuery += " WHERE USER_ID = ?";
 		}
@@ -284,9 +286,9 @@ public class DBManager
 			dbConnection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASS);
 			preparedStatement = dbConnection.prepareStatement(sqlQuery);
 
-			if (!userID.isEmpty())
+			if (!userName.isEmpty())
 			{
-				preparedStatement.setString(1, userID);
+				preparedStatement.setString(1, userName);
 			}
 
 			resultSet = preparedStatement.executeQuery();
@@ -317,7 +319,7 @@ public class DBManager
 	{
 		List<User> userList = new ArrayList<User>();
 
-		if (!validateUserID(userName))
+		if (!validateUserName(userName))
 		{
 			return userList;
 		}
@@ -462,12 +464,13 @@ public class DBManager
 	{
 		// Important
 
-		if (name.isEmpty())
+		if (AuthenticationRequestFilter.USER_ROLE.equals(UserRole.ADMIN.toString())
+				|| name.equalsIgnoreCase(AuthenticationRequestFilter.USER_NAME))
 		{
-			return false;
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	private void closeConnection()

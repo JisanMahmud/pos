@@ -49,7 +49,7 @@ public class UserManager
 		ArrayList<String> paramList = new ArrayList<>();
 		paramList.add(userName);
 
-		return dbManager.ExecuteUpdate(sqlQuery, paramList);
+		return dbManager.executeUpdate(sqlQuery, paramList);
 	}
 
 	public String getUserPassword(String userName)

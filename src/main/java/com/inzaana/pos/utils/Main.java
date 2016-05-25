@@ -2,6 +2,7 @@ package com.inzaana.pos.utils;
 
 import java.util.List;
 
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -23,7 +24,27 @@ public class Main
 		
 		//	testProduct();
 		// testDBAccess();
-		testUser();
+		// testUser();
+		//testCategory();
+		//testProduct();
+		
+		String userNameAndPassword = " Jisan: s";
+		String[] credentials = userNameAndPassword.split(":");
+
+		System.out.println(Integer.toString(credentials.length));
+		if (credentials.length != 2)
+		{
+			System.out.println("Error");
+			return;
+		}
+		else if (credentials[0].trim().isEmpty() || credentials[1].trim().isEmpty())
+		{
+			System.out.println("Index Error");
+			return;
+		}
+		
+		System.out.println(credentials[0]);
+		System.out.println(credentials[1]);
 		
 	}
 	
@@ -35,14 +56,14 @@ public class Main
 
 	public static void testProduct()
 	{
-//		Product product = new Product("id_1", "reference_1", "code_1", "codetype_1", "name_1", 100.12, 200.12, "category_1", "taxcat",
-//				"attributeset_id", 100.12, 100.12, "image", true, true, true, true, true, true, "attributes",
-//				"display", 100, 100, "textTip", 100, 100.12);
-//		
+		Product product = new Product("id_1", "Updated_reference", "code_1", "codetype_1", "name_1", 100.12, 200.12, "category_1", "taxcat",
+				"attributeset_id", 100.12, 100.12, "image", true, true, true, true, true, true, "attributes",
+				"display", 100, 100, "textTip", 100, 100.12);
+		
 //		product.insertRecordIntoDB("Jisan");
+		product.updateRecordInDB("Jisan");
 		
-		
-		ProductManager manager = new ProductManager();
+//		ProductManager manager = new ProductManager();
 //		List<Product> productList = manager.getProducts("");
 //		
 //		for (Product productItem : productList)
@@ -76,7 +97,15 @@ public class Main
 		// }
 	}
 
-	public void testJaxB()
+	public static void testCategory()
+	{
+		Category category = new Category("id", "name_4", "parentId", "image", "textTip", 200);
+		
+//		category.insertRecordIntoDB("Jisan");
+		category.updateRecordInDB("Jisan");
+	}
+	
+	public static void testJaxB()
 	{
 		Category category = new Category("id", "name_4", "parentId", "image", "textTip", 100);
 		try

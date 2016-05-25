@@ -16,7 +16,7 @@ public class CategoryManager
 		dbManager = new DBManager();
 	}
 
-	public List<Category> getCategoryItems(String userID)
+	public List<Category> getCategoryItems(String userName)
 	{
 
 		// Category cat_1 = new Category("dsfsdfasdfasfdsdf", "Food", "sdfasf",
@@ -27,8 +27,13 @@ public class CategoryManager
 		// List<Category> categoryList = new ArrayList<Category>();
 		// categoryList.add(cat_1);
 		// categoryList.add(cat_2);
+		
+		if (!dbManager.validateUserName(userName))
+		{
+			return new ArrayList<Category>();
+		}
 
-		return dbManager.getCategoryItems(userID);
+		return dbManager.getCategoryItems(userName);
 	}
 
 	public List<Category> getAllCategoryItems()
@@ -49,25 +54,29 @@ public class CategoryManager
 		return dbManager.getCategoryItems("");
 	}
 
-	public boolean addCategory(String userId, Category newCategoryItem)
+	public boolean addCategory(String userName, Category newCategoryItem)
 	{
-		if (!dbManager.validateUserID(userId))
+		if (!dbManager.validateUserName(userName))
 		{
 			return false;
 		}
 
-		return newCategoryItem.insertRecordIntoDB(userId);
+		return newCategoryItem.insertRecordIntoDB(userName);
 	}
 
-	public String updateCategory(String userId, String categoryId, Category updatedCategoryItem)
+	public boolean updateCategory(String userName, String categoryId, Category updatedCategoryItem)
 	{
+		if (!dbManager.validateUserName(userName))
+		{
+			return false;
+		}
 
-		return "updateItemInCategory: " + userId;
+		return updatedCategoryItem.updateRecordInDB(userName);
 	}
 
-	public boolean deleteCategory(String userId, String categoryName)
+	public boolean deleteCategory(String userName, String categoryName)
 	{
-		if (!dbManager.validateUserID(userId))
+		if (!dbManager.validateUserName(userName))
 		{
 			return false;
 		}
@@ -75,9 +84,9 @@ public class CategoryManager
 		String sqlQuery = "DELETE FROM " + DBTables.CATEGORIES.toString() + " WHERE USER_ID=? AND NAME=?;";
 
 		ArrayList<String> paramList = new ArrayList<>();
-		paramList.add(userId);
+		paramList.add(userName);
 		paramList.add(categoryName);
 
-		return dbManager.ExecuteUpdate(sqlQuery, paramList);
+		return dbManager.executeUpdate(sqlQuery, paramList);
 	}
 }
