@@ -22,36 +22,26 @@ public class Main
 	{
 		System.out.println("Start Testing");
 		
+		UserManager userManager = new UserManager();
+		UserManager.USER_ID = "user_id_3";
+		userManager.verifyPassword("1234");
+		
 		//	testProduct();
 		// testDBAccess();
-		// testUser();
-		//testCategory();
+//		 testUser();
+		testCategory();
 		//testProduct();
-		
-		String userNameAndPassword = " Jisan: s";
-		String[] credentials = userNameAndPassword.split(":");
-
-		System.out.println(Integer.toString(credentials.length));
-		if (credentials.length != 2)
-		{
-			System.out.println("Error");
-			return;
-		}
-		else if (credentials[0].trim().isEmpty() || credentials[1].trim().isEmpty())
-		{
-			System.out.println("Index Error");
-			return;
-		}
-		
-		System.out.println(credentials[0]);
-		System.out.println(credentials[1]);
 		
 	}
 	
 	public static void testUser(){
 		DBManager dbManager = new DBManager();
-		System.out.println(dbManager.getUserPassword("Jisan"));
-		System.out.println(dbManager.getUserRole("Jisan"));
+		System.out.println("Password: " + dbManager.getUserPassword("user_id_1"));
+		System.out.println("Role: " + dbManager.getUserRole("user_id_1"));
+		System.out.println("Name: " + dbManager.getUserName("user_id_3"));
+		System.out.println("Name: " + dbManager.getUserNameFromNameId(2));
+		System.out.println("NameId: " + dbManager.getUserNameId("user_id_4"));
+		System.out.println("NameId: " + dbManager.getUserNameIdFromName("Mahmud"));
 	}
 
 	public static void testProduct()
@@ -78,11 +68,11 @@ public class Main
 
 	public static void testDBAccess()
 	{
-		User user = new User("Jisan", "1234", UserRole.ADMIN.ToString());
+		User user = new User("Jisan", "user_id_1", "1234", UserRole.ADMIN.ToString());
 		// user.insertRecordIntoDB();
 
 		UserManager manager = new UserManager();
-		manager.deleteUser("Jisansss");
+		manager.deleteUserId("Jisansss");
 
 		// CategoryManager manager = new CategoryManager();
 		// manager.deleteItemFromCategory("Bahnii", "name_2");
@@ -99,15 +89,19 @@ public class Main
 
 	public static void testCategory()
 	{
-		Category category = new Category("id", "name_4", "parentId", "image", "textTip", 200);
+		Category category = new Category("id_1", "name_updated", "parentId", "image", "textTip", true);
 		
 //		category.insertRecordIntoDB("Jisan");
-		category.updateRecordInDB("Jisan");
+//		category.updateRecordInDB("Jisan");
+		CategoryManager categoryManager = new CategoryManager();
+		
+		System.out.println(categoryManager.getAllCategoryItems().get(0).getName());
+		//categoryManager.deleteCategory("Mahmud", "id_1");
 	}
 	
 	public static void testJaxB()
 	{
-		Category category = new Category("id", "name_4", "parentId", "image", "textTip", 100);
+		Category category = new Category("id", "name_5", "parentId", "image", "textTip", true);
 		try
 		{
 			JAXBContext jaxbContext = JAXBContext.newInstance(Category.class);

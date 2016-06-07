@@ -19,7 +19,7 @@ public class ProductManager
 
 	public List<Product> getProducts(String userName)
 	{
-		if (!dbManager.validateUserName(userName))
+		if (!dbManager.canUserDoDBTransaction(userName))
 		{
 			return new ArrayList<Product>();
 		}
@@ -34,7 +34,7 @@ public class ProductManager
 
 	public boolean addNewProduct(String userName, Product newProduct)
 	{
-		if (!dbManager.validateUserName(userName))
+		if (!dbManager.canUserDoDBTransaction(userName))
 		{
 			return false;
 		}
@@ -44,7 +44,7 @@ public class ProductManager
 
 	public boolean updateProduct(String userName, String productName, Product updatedProduct)
 	{
-		if (!dbManager.validateUserName(userName))
+		if (!dbManager.canUserDoDBTransaction(userName))
 		{
 			return false;
 		}
@@ -54,7 +54,7 @@ public class ProductManager
 
 	public boolean deleteProduct(String userName, String productName)
 	{
-		if (!dbManager.validateUserName(userName))
+		if (!dbManager.canUserDoDBTransaction(userName))
 		{
 			return false;
 		}
@@ -62,7 +62,7 @@ public class ProductManager
 		String sqlQuery = "DELETE FROM " + DBTables.PRODUCTS.toString() + " WHERE " + Product.USER_ID + "=? AND "
 				+ Product.NAME + "=?;";
 
-		ArrayList<String> paramList = new ArrayList<>();
+		ArrayList<Object> paramList = new ArrayList<>();
 		paramList.add(userName);
 		paramList.add(productName);
 

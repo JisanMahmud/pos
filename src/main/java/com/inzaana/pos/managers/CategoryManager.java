@@ -18,17 +18,7 @@ public class CategoryManager
 
 	public List<Category> getCategoryItems(String userName)
 	{
-
-		// Category cat_1 = new Category("dsfsdfasdfasfdsdf", "Food", "sdfasf",
-		// "sdfsaf", "dfsdf", 10);
-		// Category cat_2 = new Category("dsfsdfasdfasfdsdf", "Drink", "sdfasf",
-		// "sdfsaf", "dfsdf", 10);
-		//
-		// List<Category> categoryList = new ArrayList<Category>();
-		// categoryList.add(cat_1);
-		// categoryList.add(cat_2);
-		
-		if (!dbManager.validateUserName(userName))
+		if (!dbManager.canUserDoDBTransaction(userName))
 		{
 			return new ArrayList<Category>();
 		}
@@ -38,25 +28,12 @@ public class CategoryManager
 
 	public List<Category> getAllCategoryItems()
 	{
-
-		// Category cat_1 = new Category("dsfsdfasdfasfdsdf", "Food", "sdfasf",
-		// "sdfsaf", "dfsdf", 10);
-		// Category cat_2 = new Category("dsfsdfasdfasfdsdf", "Drink", "sdfasf",
-		// "sdfsaf", "dfsdf", 10);
-		// Category cat_3 = new Category("dsfsdfasdfasfdsdf", "Furniture",
-		// "sdfasf", "sdfsaf", "dfsdf", 10);
-		//
-		// List<Category> categoryList = new ArrayList<Category>();
-		// categoryList.add(cat_1);
-		// categoryList.add(cat_2);
-		// categoryList.add(cat_3);
-
 		return dbManager.getCategoryItems("");
 	}
 
 	public boolean addCategory(String userName, Category newCategoryItem)
 	{
-		if (!dbManager.validateUserName(userName))
+		if (!dbManager.canUserDoDBTransaction(userName))
 		{
 			return false;
 		}
@@ -64,9 +41,9 @@ public class CategoryManager
 		return newCategoryItem.insertRecordIntoDB(userName);
 	}
 
-	public boolean updateCategory(String userName, String categoryId, Category updatedCategoryItem)
+	public boolean updateCategory(String userName, Category updatedCategoryItem)
 	{
-		if (!dbManager.validateUserName(userName))
+		if (!dbManager.canUserDoDBTransaction(userName))
 		{
 			return false;
 		}
@@ -74,18 +51,24 @@ public class CategoryManager
 		return updatedCategoryItem.updateRecordInDB(userName);
 	}
 
-	public boolean deleteCategory(String userName, String categoryName)
+	public boolean deleteCategory(String userName, String categoryId)
 	{
-		if (!dbManager.validateUserName(userName))
+		if (!dbManager.canUserDoDBTransaction(userName))
 		{
 			return false;
 		}
 
-		String sqlQuery = "DELETE FROM " + DBTables.CATEGORIES.toString() + " WHERE USER_ID=? AND NAME=?;";
+		Integer userNameId = dbManager.getUserNameIdFromName(userName);
+		if (userNameId < 0)
+		{
+			return false;
+		}
 
-		ArrayList<String> paramList = new ArrayList<>();
-		paramList.add(userName);
-		paramList.add(categoryName);
+		String sqlQuery = "DELETE FROM " + DBTables.CATEGORIES.toString() + " WHERE USER_ID=? AND ID=?;";
+
+		ArrayList<Object> paramList = new ArrayList<>();
+		paramList.add(userNameId);
+		paramList.add(categoryId);
 
 		return dbManager.executeUpdate(sqlQuery, paramList);
 	}

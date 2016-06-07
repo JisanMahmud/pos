@@ -30,9 +30,6 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter
 	@Context
 	private ResourceInfo		resourceInfo;
 
-	public static String		USER_NAME					= "***@@@***DEFAULT_USER_NAME***@@@***";
-	public static String		USER_ROLE					= UserRole.GUEST.toString();
-
 	private static final String	AUTHORIZATION_PROPERTY		= "Authorization";
 	private static final String	AUTHENTICATION_SCHEME		= "Basic";
 	private static final String	ACCESS_UNAUTHORIZED			= "ACCESS UNAUTHORIZED : ";
@@ -79,22 +76,21 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter
 			return;
 		}
 
-		String userName = credentials[0];
-		USER_NAME = userName;
+		UserManager userManager = new UserManager();
+		
+		String userId = credentials[0];		
 		String userPassword = credentials[1];
 
-		UserManager userManager = new UserManager();
-		String savedPassword = userManager.getUserPassword(userName);
-		if (!userPassword.equals(savedPassword))
+		UserManager.USER_ID = userId;
+		
+		if (!userManager.verifyPassword(userPassword))
 		{
 			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-					.entity("Password Missmatch : " + savedPassword + " : " + userPassword).build());
+					.entity("Password Missmatch.").build());
 			return;
 		}
-
-		String userRole = userManager.getUserRole(userName);
-		USER_ROLE = userRole;
-		if (userRole.equals(UserRole.GUEST.toString()))
+		
+		if (UserManager.USER_ROLE.equals(UserRole.GUEST.toString()))
 		{
 			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).entity("GUEST USER ROLE NOT ALLOWED")
 					.build());
@@ -102,7 +98,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter
 		}
 
 		String scheme = requestContext.getUriInfo().getRequestUri().getScheme();
-		User user = new User(userName, savedPassword, userRole);
+		User user = new User(UserManager.USER_NAME, UserManager.USER_ID, userPassword, UserManager.USER_ROLE);
 		requestContext.setSecurityContext(new InzaanaSecurityContext(user, scheme));
 	}
 }

@@ -14,19 +14,22 @@ public class User implements Principal
 {
 
 	final static public String				NAME		= "NAME";
+	final static public String				USER_ID		= "USER_ID";
 	final static public String				PASSWORD	= "PASSWORD";
 	final static public String				ROLE		= "ROLE";
 
 	private String							userName;
+	private String							userId;
 	private String							userPassword;
 	private String							userRole;
 
 	private ArrayList<Pair<String, String>>	userTableStringList;
 
-	public User(String userName, String userPassword, String userRole)
+	public User(String userName, String userId, String userPassword, String userRole)
 	{
 		userTableStringList = new ArrayList<>();
 		this.SetUserName(userName);
+		this.SetUserId(userId);
 		this.SetUserPassword(userPassword);
 		this.SetUserRole(userRole);
 	}
@@ -51,6 +54,17 @@ public class User implements Principal
 	{
 		this.userName = userName;
 		userTableStringList.add(new Pair<String, String>(NAME, userName));
+	}
+
+	public String GetUserId()
+	{
+		return userId;
+	}
+
+	public void SetUserId(String userId)
+	{
+		this.userId = userId;
+		userTableStringList.add(new Pair<String, String>(USER_ID, userId));
 	}
 
 	public String GetUserPassword()
@@ -100,12 +114,12 @@ public class User implements Principal
 
 		DBManager dbManager = new DBManager();
 
-		if (!dbManager.validateUserName(getName()))
+		if (!dbManager.canUserDoDBTransaction(getName()))
 		{
 			return false;
 		}
 
-		return dbManager.executeUpdate(sqlQuery, new ArrayList<String>());
+		return dbManager.executeUpdate(sqlQuery, new ArrayList<Object>());
 	}
 
 	public boolean updateRecordInDB(String userID)

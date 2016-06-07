@@ -6,7 +6,9 @@ public enum DBTables
 	PRODUCTS("PRODUCTS"), //
 	PAYMENTS("Payment"), //
 	STOCKDIARY("STOCKDIARY"), //
-	USERS("USERS"); //
+	USERNAME("NAME"), //
+	USERS("USERS"), //
+	NONE("NONE"); //
 
 	String	tableName;
 

@@ -57,13 +57,13 @@ public class CategoryResource
 	}
 
 	@POST
-	@Path("/{userName}/{categoryName}")
+	@Path("/{userName}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed({ "ADMIN", "POS" })
 	public String updateCategory(@PathParam("userName") String userName,
-			@PathParam("categoryName") String categoryName, Category updatedCategory)
+			Category updatedCategory)
 	{
-		if (!categoryManager.updateCategory(userName, categoryName, updatedCategory))
+		if (!categoryManager.updateCategory(userName, updatedCategory))
 		{
 			return FAILURE_MSG;
 		}
@@ -72,12 +72,12 @@ public class CategoryResource
 	}
 
 	@DELETE
-	@Path("/{userName}/{categoryName}")
+	@Path("/{userName}/{categoryId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed({ "ADMIN", "POS" })
-	public String deleteCategory(@PathParam("userName") String userName, @PathParam("categoryName") String categoryName)
+	public String deleteCategory(@PathParam("userName") String userName, @PathParam("categoryId") String categoryId)
 	{
-		if (!categoryManager.deleteCategory(userName, categoryName))
+		if (!categoryManager.deleteCategory(userName, categoryId))
 		{
 			return FAILURE_MSG;
 		}

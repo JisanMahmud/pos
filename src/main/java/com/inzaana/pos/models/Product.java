@@ -482,12 +482,12 @@ public class Product
 
 		DBManager dbManager = new DBManager();
 
-		if (!dbManager.validateUserID(userID))
+		if (!dbManager.validateUserId(userID))
 		{
 			return false;
 		}
 
-		ArrayList<String> paramList = new ArrayList<>();
+		ArrayList<Object> paramList = new ArrayList<>();
 		paramList.add(userID);
 
 		return dbManager.executeUpdate(sqlQuery, paramList);
@@ -532,12 +532,12 @@ public class Product
 
 		DBManager dbManager = new DBManager();
 
-		if (!dbManager.validateUserID(userID))
+		if (!dbManager.validateUserId(userID))
 		{
 			return false;
 		}
 
-		ArrayList<String> paramList = new ArrayList<>();
+		ArrayList<Object> paramList = new ArrayList<>();
 		paramList.add(userID);
 		paramList.add(name);
 

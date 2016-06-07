@@ -21,12 +21,12 @@ public class Category
 	final static public String					CATSHOWNAME	= "CATSHOWNAME";
 
 	private String								id;
-	private String								userId;
+	private int									userId;
 	private String								name;
 	private String								parentId;
 	private String								image;
 	private String								textTip;
-	private int									catShowName;
+	private boolean								catShowName;
 
 	private ArrayList<Pair<String, String>>		categoryTableStringList;
 	private ArrayList<Pair<String, Integer>>	categoryTableIntegerList;
@@ -45,7 +45,7 @@ public class Category
 	 * @param textTip
 	 * @param catShowName
 	 */
-	public Category(String id, String name, String parentId, String image, String textTip, int catShowName)
+	public Category(String id, String name, String parentId, String image, String textTip, boolean catShowName)
 	{
 		categoryTableStringList = new ArrayList<>();
 		categoryTableIntegerList = new ArrayList<>();
@@ -69,12 +69,12 @@ public class Category
 		categoryTableStringList.add(new Pair<String, String>(ID, id));
 	}
 
-	public String getUserId()
+	public int getUserId()
 	{
 		return userId;
 	}
 
-	public void setUserId(String userId)
+	public void setUserId(int userId)
 	{
 		this.userId = userId;
 	}
@@ -123,20 +123,21 @@ public class Category
 		categoryTableStringList.add(new Pair<String, String>(TEXTTIP, textTip));
 	}
 
-	public int getCatShowName()
+	public boolean getCatShowName()
 	{
 		return catShowName;
 	}
 
-	public void setCatShowName(int catShowName)
+	public void setCatShowName(boolean catShowName)
 	{
 		this.catShowName = catShowName;
-		categoryTableIntegerList.add(new Pair<String, Integer>(CATSHOWNAME, catShowName));
+		int intValue = catShowName ? 1 : 0;
+		categoryTableIntegerList.add(new Pair<String, Integer>(CATSHOWNAME, intValue));
 	}
 
 	// ------------------------------------------------------------
 
-	public boolean insertRecordIntoDB(String userID)
+	public boolean insertRecordIntoDB(String userName)
 	{
 
 		String sqlQuery = "INSERT INTO " + DBTables.CATEGORIES.toString() + " (";
@@ -159,18 +160,24 @@ public class Category
 
 		DBManager dbManager = new DBManager();
 
-		if (!dbManager.validateUserID(userID))
+		if (!dbManager.validateUserId(userName))
 		{
 			return false;
 		}
 
-		ArrayList<String> paramList = new ArrayList<>();
-		paramList.add(userID);
+		Integer userNameId = dbManager.getUserNameIdFromName(userName);
+		if (userNameId < 0)
+		{
+			return false;
+		}
+
+		ArrayList<Object> paramList = new ArrayList<>();
+		paramList.add(userNameId);
 
 		return dbManager.executeUpdate(sqlQuery, paramList);
 	}
 
-	public boolean updateRecordInDB(String userID)
+	public boolean updateRecordInDB(String userName)
 	{
 
 		String sqlQuery = "UPDATE " + DBTables.CATEGORIES.toString() + " SET ";
@@ -192,18 +199,24 @@ public class Category
 			sqlQuery += categoryTableIntegerList.get(i).getSecond().toString();
 		}
 
-		sqlQuery += " WHERE " + USER_ID + "=? AND " + NAME + "=?;";
+		sqlQuery += " WHERE " + USER_ID + "=? AND " + ID + "=?;";
 
 		DBManager dbManager = new DBManager();
 
-		if (!dbManager.validateUserID(userID))
+		if (!dbManager.validateUserId(userName))
+		{
+			return false;
+		}
+		
+		Integer userNameId = dbManager.getUserNameIdFromName(userName);
+		if (userNameId < 0)
 		{
 			return false;
 		}
 
-		ArrayList<String> paramList = new ArrayList<>();
-		paramList.add(userID);
-		paramList.add(name);
+		ArrayList<Object> paramList = new ArrayList<>();
+		paramList.add(userNameId);
+		paramList.add(id);
 
 		return dbManager.executeUpdate(sqlQuery, paramList);
 	}

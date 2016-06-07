@@ -10,11 +10,13 @@ import java.util.List;
 import java.sql.PreparedStatement;
 
 import com.inzaana.pos.filters.AuthenticationRequestFilter;
+import com.inzaana.pos.managers.UserManager;
 import com.inzaana.pos.models.Category;
 import com.inzaana.pos.models.Payment;
 import com.inzaana.pos.models.Product;
 import com.inzaana.pos.models.StockDiary;
 import com.inzaana.pos.models.User;
+import com.inzaana.pos.utils.DBResponse;
 import com.inzaana.pos.utils.DBTables;
 import com.inzaana.pos.utils.UserRole;
 
@@ -36,7 +38,7 @@ public class DBManager
 	{
 	}
 
-	public boolean executeUpdate(String sqlQuery, ArrayList<String> paramList)
+	public boolean executeUpdate(String sqlQuery, ArrayList<Object> paramList)
 	{
 		boolean success = true;
 
@@ -49,7 +51,7 @@ public class DBManager
 			preparedStatement = dbConnection.prepareStatement(sqlQuery);
 			for (int i = 0; i < paramList.size(); i++)
 			{
-				preparedStatement.setString(i + 1, paramList.get(i));
+				preparedStatement.setObject(i + 1, paramList.get(i));
 			}
 
 			System.out.println(sqlQuery + paramList.toString());
@@ -76,10 +78,20 @@ public class DBManager
 	public List<Category> getCategoryItems(String userName)
 	{
 		List<Category> categoryList = new ArrayList<Category>();
+		int userNameId = -5555;
 
-		if (!validateUserName(userName))
+		if (!userName.isEmpty())
 		{
-			return categoryList;
+			if (!validateUserName(userName))
+			{
+				return categoryList;
+			}
+
+			userNameId = getUserNameIdFromName(userName);
+			if (userNameId < 0)
+			{
+				return categoryList;
+			}
 		}
 
 		String sqlQuery = "SELECT * FROM " + DBTables.CATEGORIES.toString();
@@ -98,7 +110,7 @@ public class DBManager
 
 			if (!userName.isEmpty())
 			{
-				preparedStatement.setString(1, userName);
+				preparedStatement.setInt(1, userNameId);
 			}
 
 			resultSet = preparedStatement.executeQuery();
@@ -107,12 +119,12 @@ public class DBManager
 			{
 				Category category = new Category();
 				category.setId(resultSet.getString(Category.ID));
-				category.setUserId(resultSet.getString(Category.USER_ID));
+				category.setUserId(resultSet.getInt(Category.USER_ID));
 				category.setName(resultSet.getString(Category.NAME));
 				category.setParentId(resultSet.getString(Category.PARENTID));
 				category.setImage(resultSet.getString(Category.IMAGE));
 				category.setTextTip(resultSet.getString(Category.TEXTTIP));
-				category.setCatShowName(resultSet.getInt(Category.CATSHOWNAME));
+				category.setCatShowName(resultSet.getBoolean(Category.CATSHOWNAME));
 				categoryList.add(category);
 			}
 		}
@@ -136,7 +148,7 @@ public class DBManager
 	{
 		List<Product> productList = new ArrayList<Product>();
 
-		if (!validateUserName(userName))
+		if (!canUserDoDBTransaction(userName))
 		{
 			return productList;
 		}
@@ -215,7 +227,7 @@ public class DBManager
 	{
 		List<Payment> paymentList = new ArrayList<Payment>();
 
-		if (!validateUserName(userName))
+		if (!canUserDoDBTransaction(userName))
 		{
 			return paymentList;
 		}
@@ -267,7 +279,7 @@ public class DBManager
 	{
 		List<StockDiary> stockList = new ArrayList<StockDiary>();
 
-		if (!validateUserName(userName))
+		if (!canUserDoDBTransaction(userName))
 		{
 			return stockList;
 		}
@@ -314,21 +326,144 @@ public class DBManager
 
 		return stockList;
 	}
-
-	public List<User> getUsers(String userName)
+	
+	public int getUserNameIdFromName(String userName)
 	{
-		List<User> userList = new ArrayList<User>();
+		int userNameId = -5555;
 
 		if (!validateUserName(userName))
 		{
-			return userList;
+			return userNameId;
 		}
 
-		String sqlQuery = "SELECT * FROM " + DBTables.PRODUCTS.toString();
+		String sqlQuery = "SELECT * FROM " + DBTables.USERNAME.toString();
+		sqlQuery += " WHERE NAME = ?";
 
-		if (!userName.isEmpty())
+		try
 		{
-			sqlQuery += " WHERE NAME = ?";
+			Class.forName(JDBC_DRIVER);
+			System.out.println("Connecting to database...");
+			dbConnection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASS);
+			preparedStatement = dbConnection.prepareStatement(sqlQuery);
+			preparedStatement.setString(1, userName);
+
+			resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next())
+			{
+				userNameId = resultSet.getInt("ID");
+			}
+		}
+		catch (SQLException se)
+		{
+			se.printStackTrace();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			closeConnection();
+		}
+
+		return userNameId;
+	}
+
+	public String getUserNameFromNameId(int userNameId)
+	{
+		String userName = UserManager.USER_NAME;
+
+		String sqlQuery = "SELECT * FROM " + DBTables.USERNAME.toString() + " WHERE ID = ?";
+
+		try
+		{
+			Class.forName(JDBC_DRIVER);
+			System.out.println("Connecting to database...");
+			dbConnection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASS);
+			preparedStatement = dbConnection.prepareStatement(sqlQuery);
+			preparedStatement.setInt(1, userNameId);
+
+			resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next())
+			{
+				userName = resultSet.getString("NAME");
+			}
+		}
+		catch (SQLException se)
+		{
+			se.printStackTrace();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			closeConnection();
+		}
+
+		return userName;
+	}
+
+	public int getUserNameId(String userId)
+	{
+		int userNameId = -5555;
+
+		if (!validateUserId(userId))
+		{
+			return userNameId;
+		}
+
+		String sqlQuery = "SELECT * FROM " + DBTables.USERS.toString() + " WHERE USER_ID = ?";
+
+		try
+		{
+			Class.forName(JDBC_DRIVER);
+			System.out.println("Connecting to database...");
+			dbConnection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASS);
+			preparedStatement = dbConnection.prepareStatement(sqlQuery);
+			preparedStatement.setString(1, userId);
+
+			resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next())
+			{
+				userNameId = resultSet.getInt("NAME");
+			}
+		}
+		catch (SQLException se)
+		{
+			se.printStackTrace();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			closeConnection();
+		}
+
+		return userNameId;
+	}
+
+	public String getUserName(String userId)
+	{
+		int userNameId = getUserNameId(userId);
+		String userName = UserManager.USER_NAME;
+
+		if (!validateUserId(userId))
+		{
+			return userName;
+		}
+
+		String sqlQuery = "SELECT * FROM " + DBTables.USERNAME.toString() + " WHERE ID = ?";
+
+		if (userNameId < 0)
+		{
+			return DBResponse.FAILURE.toString();
 		}
 
 		try
@@ -337,18 +472,64 @@ public class DBManager
 			System.out.println("Connecting to database...");
 			dbConnection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASS);
 			preparedStatement = dbConnection.prepareStatement(sqlQuery);
+			preparedStatement.setInt(1, userNameId);
 
-			if (!userName.isEmpty())
+			resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next())
 			{
-				preparedStatement.setString(1, userName);
+				userName = resultSet.getString("NAME");
 			}
+		}
+		catch (SQLException se)
+		{
+			se.printStackTrace();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			closeConnection();
+		}
+
+		return userName;
+	}
+
+	public List<User> getUsers(String userName)
+	{
+		List<User> userList = new ArrayList<User>();
+		
+		if (!canUserDoDBTransaction(userName))
+		{
+			return userList;
+		}
+		
+		int userNameId = getUserNameIdFromName(userName);
+
+		String sqlQuery = "SELECT * FROM " + DBTables.USERS.toString() + " WHERE NAME = ?";
+		if (userNameId < 0)
+		{
+
+			return userList;
+		}
+
+		try
+		{
+			Class.forName(JDBC_DRIVER);
+			System.out.println("Connecting to database...");
+			dbConnection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASS);
+			preparedStatement = dbConnection.prepareStatement(sqlQuery);
+			preparedStatement.setInt(1, userNameId);
 
 			resultSet = preparedStatement.executeQuery();
 
 			while (resultSet.next())
 			{
 				User user = new User();
-				user.SetUserName(resultSet.getString(User.NAME));
+				user.SetUserName(userName);
+				user.SetUserId(resultSet.getString(User.USER_ID));
 				user.SetUserPassword(resultSet.getString(User.PASSWORD));
 				user.SetUserRole(resultSet.getString(User.ROLE));
 				userList.add(user);
@@ -370,16 +551,16 @@ public class DBManager
 		return userList;
 	}
 
-	public String getUserPassword(String userName)
+	public String getUserPassword(String userId)
 	{
 		String password = "*@*@*@**USER_PASSWORD_NOT_FOUND**@*@*@*";
 
-		if (!validateUserName(userName))
+		if (!validateUserId(userId))
 		{
 			return password;
 		}
 
-		String sqlQuery = "SELECT password FROM " + DBTables.USERS.toString() + " WHERE name = ?";
+		String sqlQuery = "SELECT password FROM " + DBTables.USERS.toString() + " WHERE user_id = ?";
 
 		try
 		{
@@ -387,7 +568,7 @@ public class DBManager
 			System.out.println("Connecting to database...");
 			dbConnection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASS);
 			preparedStatement = dbConnection.prepareStatement(sqlQuery);
-			preparedStatement.setString(1, userName);
+			preparedStatement.setString(1, userId);
 
 			resultSet = preparedStatement.executeQuery();
 
@@ -412,16 +593,16 @@ public class DBManager
 		return password;
 	}
 
-	public String getUserRole(String userName)
+	public String getUserRole(String userId)
 	{
 		String userRole = UserRole.GUEST.toString();
 
-		if (!validateUserName(userName))
+		if (!validateUserId(userId))
 		{
 			return userRole;
 		}
 
-		String sqlQuery = "SELECT role FROM " + DBTables.USERS.toString() + " WHERE name = ?";
+		String sqlQuery = "SELECT role FROM " + DBTables.USERS.toString() + " WHERE user_id = ?";
 
 		try
 		{
@@ -429,7 +610,7 @@ public class DBManager
 			System.out.println("Connecting to database...");
 			dbConnection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASS);
 			preparedStatement = dbConnection.prepareStatement(sqlQuery);
-			preparedStatement.setString(1, userName);
+			preparedStatement.setString(1, userId);
 
 			resultSet = preparedStatement.executeQuery();
 
@@ -454,18 +635,23 @@ public class DBManager
 		return userRole;
 	}
 
-	public boolean validateUserID(String id)
+	public boolean validateUserId(String id)
 	{
-		// Important
+		// Important for sql injection attack
 		return true;
 	}
 
-	public boolean validateUserName(String name)
+	public boolean validateUserName(String userName)
+	{
+		// Important for sql injection attack
+		return true;
+	}
+
+	public boolean canUserDoDBTransaction(String name)
 	{
 		// Important
 
-		if (AuthenticationRequestFilter.USER_ROLE.equals(UserRole.ADMIN.toString())
-				|| name.equalsIgnoreCase(AuthenticationRequestFilter.USER_NAME))
+		if (UserManager.USER_ROLE.equals(UserRole.ADMIN.toString()) || name.equalsIgnoreCase(UserManager.USER_NAME))
 		{
 			return true;
 		}
