@@ -69,7 +69,7 @@ public class UserManager
 			USER_NAME_ID = dbManager.getUserNameId(USER_ID);
 		}
 
-		return false;
+		return success;
 	}
 
 	public boolean addPasswordForNewUser(String password)
@@ -154,6 +154,8 @@ public class UserManager
 			return DBResponse.REGISTRATION_FAILURE.toString();
 		}
 		
-		return DBResponse.SUCCESS.toString();
+		System.out.println("New User registration successful. Return Name " + USER_NAME);
+		
+		return USER_NAME;
 	}
 }

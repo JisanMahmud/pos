@@ -32,6 +32,11 @@ public class User implements Principal
 		this.SetUserId(userId);
 		this.SetUserPassword(userPassword);
 		this.SetUserRole(userRole);
+		
+		System.out.println("USER NAME: " + userName);
+		System.out.println("USER ID: " + userId);
+		System.out.println("USER PASSWORD: " + userPassword);
+		System.out.println("USER ROLE: " + userRole);
 	}
 
 	public User()

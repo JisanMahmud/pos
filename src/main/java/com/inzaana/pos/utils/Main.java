@@ -1,6 +1,7 @@
 package com.inzaana.pos.utils;
 
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
@@ -22,14 +23,20 @@ public class Main
 	{
 		System.out.println("Start Testing");
 		
-		UserManager userManager = new UserManager();
-		UserManager.USER_ID = "user_id_3";
-		userManager.verifyPassword("1234");
+		Preferences p = Preferences.userRoot();
+		System.out.println("Key: " + p.get("INZAANA_SECURITY_KEY", "NOT FOUND"));
+		System.out.println("ID: " + p.get("INZAANA_USER_ID", "NOT FOUND"));
+		p.remove("INZAANA_SECURITY_KEY");
+		p.remove("INZAANA_USER_ID");
+		
+//		UserManager userManager = new UserManager();
+//		UserManager.USER_ID = "user_id_3";
+//		userManager.verifyPassword("1234");
 		
 		//	testProduct();
 		// testDBAccess();
 //		 testUser();
-		testCategory();
+//		testCategory();
 		//testProduct();
 		
 	}

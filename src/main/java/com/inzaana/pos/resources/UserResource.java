@@ -53,6 +53,7 @@ public class UserResource {
 	@RolesAllowed({ "ADMIN", "POS" })
 	public String registerNewUser()
 	{
+		System.out.println("Registering New User");
 		return userManager.registerNewUser();
 	}
 

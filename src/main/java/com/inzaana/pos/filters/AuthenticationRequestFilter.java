@@ -85,6 +85,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter
 		
 		if (!userManager.verifyPassword(userPassword))
 		{
+			System.out.println("Password Missmatch");
 			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
 					.entity("Password Missmatch.").build());
 			return;
@@ -92,6 +93,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter
 		
 		if (UserManager.USER_ROLE.equals(UserRole.GUEST.toString()))
 		{
+			System.out.println("GUEST user role not allowed");
 			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).entity("GUEST USER ROLE NOT ALLOWED")
 					.build());
 			return;
