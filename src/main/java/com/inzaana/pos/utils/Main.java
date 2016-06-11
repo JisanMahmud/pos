@@ -11,9 +11,11 @@ import javax.xml.bind.Marshaller;
 import com.inzaana.pos.db.DBManager;
 import com.inzaana.pos.managers.CategoryManager;
 import com.inzaana.pos.managers.ProductManager;
+import com.inzaana.pos.managers.StockDiaryManager;
 import com.inzaana.pos.managers.UserManager;
 import com.inzaana.pos.models.Category;
 import com.inzaana.pos.models.Product;
+import com.inzaana.pos.models.StockDiary;
 import com.inzaana.pos.models.User;
 
 public class Main
@@ -28,17 +30,28 @@ public class Main
 		System.out.println("ID: " + p.get("INZAANA_USER_ID", "NOT FOUND"));
 		p.remove("INZAANA_SECURITY_KEY");
 		p.remove("INZAANA_USER_ID");
+		p.remove("INZAANA_USER_NAME");
+		p.remove("INZAANA_URL");
 		
 //		UserManager userManager = new UserManager();
-//		UserManager.USER_ID = "user_id_3";
+//		UserManager.USER_ID = "user_id_1";
 //		userManager.verifyPassword("1234");
 		
 		//	testProduct();
 		// testDBAccess();
 //		 testUser();
 //		testCategory();
-		//testProduct();
+//		testProduct();
+
+//		testStock();
+	}
+	
+	public static void testStock(){
+		StockDiary stock = new StockDiary("id", "dateNewNew", 1, "location", "product", "attributeSetInstance_id", 100.00, 100.00, "appUser");
 		
+		StockDiaryManager manager = new StockDiaryManager();
+		
+		System.out.println(manager.deleteStockDiaryItem("Jisan", "id"));
 	}
 	
 	public static void testUser(){
@@ -53,14 +66,14 @@ public class Main
 
 	public static void testProduct()
 	{
-		Product product = new Product("id_1", "Updated_reference", "code_1", "codetype_1", "name_1", 100.12, 200.12, "category_1", "taxcat",
+		Product product = new Product("id_2", "new_reference", "code_2", "codetype_2", "name_Updated", 100.12, 200.12, "category_1", "taxcat",
 				"attributeset_id", 100.12, 100.12, "image", true, true, true, true, true, true, "attributes",
-				"display", 100, 100, "textTip", 100, 100.12);
-		
+				"display", true, true, "textTip", true, 100.12);
+//		
 //		product.insertRecordIntoDB("Jisan");
-		product.updateRecordInDB("Jisan");
+//		product.updateRecordInDB("Jisan");
 		
-//		ProductManager manager = new ProductManager();
+		ProductManager manager = new ProductManager();
 //		List<Product> productList = manager.getProducts("");
 //		
 //		for (Product productItem : productList)
@@ -70,7 +83,9 @@ public class Main
 //			System.out.println("-------------------------");
 //		}
 		
-		//manager.deleteProduct("Jisan", "name");
+//		System.out.println(manager.updateProduct("Jisan", product));
+		
+		manager.deleteProduct("Jisan", "id_2");
 	}
 
 	public static void testDBAccess()
@@ -96,13 +111,14 @@ public class Main
 
 	public static void testCategory()
 	{
-		Category category = new Category("id_1", "name_updated", "parentId", "image", "textTip", true);
+		Category category = new Category("id_12", "Update Cat", "parentId", "image", "textTip", true);
 		
-//		category.insertRecordIntoDB("Jisan");
+//		System.out.println(category.insertRecordIntoDB("Jisan"));
 //		category.updateRecordInDB("Jisan");
 		CategoryManager categoryManager = new CategoryManager();
+		System.out.println(categoryManager.deleteCategory("Jisan", "id_12"));
 		
-		System.out.println(categoryManager.getAllCategoryItems().get(0).getName());
+//		System.out.println(categoryManager.getAllCategoryItems().get(0).getName());
 		//categoryManager.deleteCategory("Mahmud", "id_1");
 	}
 	

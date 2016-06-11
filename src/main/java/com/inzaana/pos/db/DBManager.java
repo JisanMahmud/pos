@@ -17,7 +17,9 @@ import com.inzaana.pos.models.Product;
 import com.inzaana.pos.models.StockDiary;
 import com.inzaana.pos.models.User;
 import com.inzaana.pos.utils.DBResponse;
+import com.inzaana.pos.utils.DBResponsePerser;
 import com.inzaana.pos.utils.DBTables;
+import com.inzaana.pos.utils.ResponseMessage;
 import com.inzaana.pos.utils.UserRole;
 
 public class DBManager
@@ -38,9 +40,10 @@ public class DBManager
 	{
 	}
 
-	public boolean executeUpdate(String sqlQuery, ArrayList<Object> paramList)
+	public boolean executeUpdate(String sqlQuery, ArrayList<Object> paramList, ResponseMessage response)
 	{
 		boolean success = true;
+		response.clear();
 
 		try
 		{
@@ -54,22 +57,31 @@ public class DBManager
 				preparedStatement.setObject(i + 1, paramList.get(i));
 			}
 
-			System.out.println(sqlQuery + paramList.toString());
+			System.out.println(sqlQuery + " \n" + paramList.toString());
 			preparedStatement.executeUpdate();
 		}
 		catch (SQLException se)
 		{
 			se.printStackTrace();
+			DBResponsePerser responsePerser = new DBResponsePerser(se.getMessage());
+			response.setMessage(responsePerser.getResponse().toString());
 			success = false;
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
+			DBResponsePerser responsePerser = new DBResponsePerser(e.getMessage());
+			response.setMessage(responsePerser.getResponse().toString());
 			success = false;
 		}
 		finally
 		{
 			closeConnection();
+		}
+
+		if (success)
+		{
+			response.setMessage(DBResponse.SUCCESS.toString());
 		}
 
 		return success;
@@ -147,16 +159,22 @@ public class DBManager
 	public List<Product> getProducts(String userName)
 	{
 		List<Product> productList = new ArrayList<Product>();
-
-		if (!canUserDoDBTransaction(userName))
-		{
-			return productList;
-		}
-
+		int userNameId = -5555;
 		String sqlQuery = "SELECT * FROM " + DBTables.PRODUCTS.toString();
 
 		if (!userName.isEmpty())
 		{
+			if (!validateUserName(userName))
+			{
+				return productList;
+			}
+
+			userNameId = getUserNameIdFromName(userName);
+			if (userNameId < 0)
+			{
+				return productList;
+			}
+
 			sqlQuery += " WHERE USER_ID = ?";
 		}
 
@@ -169,7 +187,7 @@ public class DBManager
 
 			if (!userName.isEmpty())
 			{
-				preparedStatement.setString(1, userName);
+				preparedStatement.setInt(1, userNameId);
 			}
 
 			resultSet = preparedStatement.executeQuery();
@@ -178,7 +196,7 @@ public class DBManager
 			{
 				Product product = new Product();
 				product.setId(resultSet.getString(Product.ID));
-				product.setUserId(resultSet.getString(Product.USER_ID));
+				product.setUserId(resultSet.getInt(Product.USER_ID));
 				product.setReference(resultSet.getString(Product.REFERENCE));
 				product.setCode(resultSet.getString(Product.CODE));
 				product.setCodetype(resultSet.getString(Product.CODETYPE));
@@ -199,10 +217,10 @@ public class DBManager
 				product.setService(resultSet.getBoolean(Product.ISSERVICE));
 				product.setAttributes(resultSet.getString(Product.ATTRIBUTES));
 				product.setDisplay(resultSet.getString(Product.DISPLAY));
-				product.setIsVPrice(resultSet.getInt(Product.ISVPRICE));
-				product.setIsVerpatrib(resultSet.getInt(Product.ISVERPATRIB));
+				product.setIsVPrice(resultSet.getBoolean(Product.ISVPRICE));
+				product.setIsVerpatrib(resultSet.getBoolean(Product.ISVERPATRIB));
 				product.setTextTip(resultSet.getString(Product.TEXTTIP));
-				product.setWarranty(resultSet.getInt(Product.WARRANTY));
+				product.setWarranty(resultSet.getBoolean(Product.WARRANTY));
 				product.setStockunits(resultSet.getDouble(Product.STOCKUNITS));
 				productList.add(product);
 			}
@@ -277,17 +295,25 @@ public class DBManager
 
 	public List<StockDiary> getStockDiaryItems(String userName)
 	{
+
 		List<StockDiary> stockList = new ArrayList<StockDiary>();
+		int userNameId = -5555;
 
-		if (!canUserDoDBTransaction(userName))
-		{
-			return stockList;
-		}
-
-		String sqlQuery = "SELECT * FROM " + DBTables.PRODUCTS.toString();
+		String sqlQuery = "SELECT * FROM " + DBTables.STOCKDIARY.toString();
 
 		if (!userName.isEmpty())
 		{
+			if (!validateUserName(userName))
+			{
+				return stockList;
+			}
+
+			userNameId = getUserNameIdFromName(userName);
+			if (userNameId < 0)
+			{
+				return stockList;
+			}
+
 			sqlQuery += " WHERE USER_ID = ?";
 		}
 
@@ -300,7 +326,7 @@ public class DBManager
 
 			if (!userName.isEmpty())
 			{
-				preparedStatement.setString(1, userName);
+				preparedStatement.setInt(1, userNameId);
 			}
 
 			resultSet = preparedStatement.executeQuery();
@@ -308,6 +334,17 @@ public class DBManager
 			while (resultSet.next())
 			{
 				StockDiary stock = new StockDiary();
+				stock.setId(resultSet.getString(StockDiary.ID));
+				stock.setUserId(resultSet.getInt(StockDiary.USER_ID));
+				stock.setDateNew(resultSet.getString(StockDiary.DATENEW));
+				stock.setReason(resultSet.getInt(StockDiary.REASON));
+				stock.setLocation(resultSet.getString(StockDiary.LOCATION));
+				stock.setProduct(resultSet.getString(StockDiary.PRODUCT));
+				stock.setAttributeSetInstance_id(resultSet.getString(StockDiary.ATTRIBUTESETINSTANCE_ID));
+				stock.setUnits(resultSet.getDouble(StockDiary.UNITS));
+				stock.setPrice(resultSet.getDouble(StockDiary.PRICE));
+				stock.setAppUser(resultSet.getString(StockDiary.APPUSER));
+
 				stockList.add(stock);
 			}
 		}
@@ -326,7 +363,7 @@ public class DBManager
 
 		return stockList;
 	}
-	
+
 	public int getUserNameIdFromName(String userName)
 	{
 		int userNameId = -5555;
@@ -500,12 +537,12 @@ public class DBManager
 	public List<User> getUsers(String userName)
 	{
 		List<User> userList = new ArrayList<User>();
-		
+
 		if (!canUserDoDBTransaction(userName))
 		{
 			return userList;
 		}
-		
+
 		int userNameId = getUserNameIdFromName(userName);
 
 		String sqlQuery = "SELECT * FROM " + DBTables.USERS.toString() + " WHERE NAME = ?";
@@ -644,6 +681,12 @@ public class DBManager
 	public boolean validateUserName(String userName)
 	{
 		// Important for sql injection attack
+
+		if (UserManager.USER_NAME_ID < 0)
+		{
+			return false;
+		}
+
 		return true;
 	}
 

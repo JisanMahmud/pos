@@ -5,8 +5,11 @@ import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.inzaana.pos.db.DBManager;
+import com.inzaana.pos.managers.UserManager;
+import com.inzaana.pos.utils.DBResponse;
 import com.inzaana.pos.utils.DBTables;
 import com.inzaana.pos.utils.Pair;
+import com.inzaana.pos.utils.ResponseMessage;
 
 @XmlRootElement
 public class Category
@@ -137,87 +140,71 @@ public class Category
 
 	// ------------------------------------------------------------
 
-	public boolean insertRecordIntoDB(String userName)
+	public String insertRecordIntoDB(String userName)
 	{
-
-		String sqlQuery = "INSERT INTO " + DBTables.CATEGORIES.toString() + " (";
-		String colNameList = USER_ID;
-		String colValueList = "?";
-
-		for (int i = 0; i < categoryTableStringList.size(); i++)
-		{
-			colNameList += ", " + categoryTableStringList.get(i).getFirst();
-			colValueList += ", '" + categoryTableStringList.get(i).getSecond() + "'";
-		}
-
-		for (int i = 0; i < categoryTableIntegerList.size(); i++)
-		{
-			colNameList += ", " + categoryTableIntegerList.get(i).getFirst();
-			colValueList += ", " + categoryTableIntegerList.get(i).getSecond().toString();
-		}
-
-		sqlQuery += colNameList + ") " + "VALUES (" + colValueList + ");";
+		System.out.println("[TEST] id: " + id);
+		System.out.println("[TEST] user id: " + userId);
+		System.out.println("[TEST] name: " + name);
+		System.out.println("[TEST] tip: " + textTip);
+		
+		
+		String sqlQuery = "INSERT INTO `categories`(`ID`, `USER_ID`, `NAME`, `PARENTID`, `IMAGE`, `TEXTTIP`, `CATSHOWNAME`) "
+				+ "VALUES (?,?,?,?,?,?,?)";
 
 		DBManager dbManager = new DBManager();
 
-		if (!dbManager.validateUserId(userName))
+		if (!dbManager.validateUserName(userName))
 		{
-			return false;
+			return DBResponse.USER_NAME_NOT_VALID.toString();
 		}
 
 		Integer userNameId = dbManager.getUserNameIdFromName(userName);
-		if (userNameId < 0)
-		{
-			return false;
-		}
+		ArrayList<Object> paramList = getColumnValueList(userNameId);
 
-		ArrayList<Object> paramList = new ArrayList<>();
-		paramList.add(userNameId);
+		ResponseMessage response = new ResponseMessage();
+		dbManager.executeUpdate(sqlQuery, paramList, response);
 
-		return dbManager.executeUpdate(sqlQuery, paramList);
+		return response.getMessage();
+
 	}
 
-	public boolean updateRecordInDB(String userName)
+	public String updateRecordInDB(String userName)
 	{
-
-		String sqlQuery = "UPDATE " + DBTables.CATEGORIES.toString() + " SET ";
-
-		for (int i = 0; i < categoryTableStringList.size(); i++)
-		{
-			sqlQuery += categoryTableStringList.get(i).getFirst() + "=";
-			sqlQuery += "'" + categoryTableStringList.get(i).getSecond() + "'";
-
-			if (i < (categoryTableStringList.size() - 1))
-			{
-				sqlQuery += ", ";
-			}
-		}
-
-		for (int i = 0; i < categoryTableIntegerList.size(); i++)
-		{
-			sqlQuery += ", " + categoryTableIntegerList.get(i).getFirst() + "=";
-			sqlQuery += categoryTableIntegerList.get(i).getSecond().toString();
-		}
-
-		sqlQuery += " WHERE " + USER_ID + "=? AND " + ID + "=?;";
+		String sqlQuery = "UPDATE `categories` SET `ID`=?,`USER_ID`=?,`NAME`=?,`PARENTID`=?,`IMAGE`=?,"
+				+ "`TEXTTIP`=?,`CATSHOWNAME`=? WHERE (`USER_ID`=? AND `ID`=?)";
 
 		DBManager dbManager = new DBManager();
 
-		if (!dbManager.validateUserId(userName))
+		if (!dbManager.validateUserName(userName))
 		{
-			return false;
-		}
-		
-		Integer userNameId = dbManager.getUserNameIdFromName(userName);
-		if (userNameId < 0)
-		{
-			return false;
+			return DBResponse.USER_ID_NOT_VALID.toString();
 		}
 
-		ArrayList<Object> paramList = new ArrayList<>();
+		Integer userNameId = dbManager.getUserNameIdFromName(userName);
+
+		ArrayList<Object> paramList = getColumnValueList(userNameId);
 		paramList.add(userNameId);
 		paramList.add(id);
 
-		return dbManager.executeUpdate(sqlQuery, paramList);
+		ResponseMessage response = new ResponseMessage();
+		dbManager.executeUpdate(sqlQuery, paramList, response);
+
+		return response.getMessage();
+
 	}
+
+	private ArrayList<Object> getColumnValueList(int userNameId)
+	{
+		ArrayList<Object> paramList = new ArrayList<>();
+		paramList.add(id);
+		paramList.add(userNameId);
+		paramList.add(name);
+		paramList.add(parentId);
+		paramList.add(image);
+		paramList.add(textTip);
+		paramList.add(catShowName);
+
+		return paramList;
+	}
+
 }

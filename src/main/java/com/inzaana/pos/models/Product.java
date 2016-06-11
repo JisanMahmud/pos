@@ -5,8 +5,11 @@ import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.inzaana.pos.db.DBManager;
+import com.inzaana.pos.managers.UserManager;
+import com.inzaana.pos.utils.DBResponse;
 import com.inzaana.pos.utils.DBTables;
 import com.inzaana.pos.utils.Pair;
+import com.inzaana.pos.utils.ResponseMessage;
 
 @XmlRootElement
 public class Product
@@ -40,7 +43,7 @@ public class Product
 	final static public String			STOCKUNITS		= "STOCKUNITS";
 
 	private String						id;
-	private String						userId;
+	private int							userId;
 	private String						reference;
 	private String						code;
 	private String						codetype;
@@ -61,10 +64,10 @@ public class Product
 	private boolean						isService;
 	private String						attributes;
 	private String						display;
-	private int							isVPrice;
-	private int							isVerpatrib;
+	private boolean						isVPrice;
+	private boolean						isVerpatrib;
 	private String						textTip;
-	private int							warranty;
+	private boolean						warranty;
 	private double						stockunits;
 
 	ArrayList<Pair<String, String>>		productTableStringList;
@@ -112,8 +115,8 @@ public class Product
 	public Product(String id, String reference, String code, String codetype, String name, double priceBuy,
 			double priceSell, String category, String taxcat, String attributeset_id, double stockCost,
 			double stockVolume, String image, boolean iscom, boolean isScale, boolean isKitchen, boolean printkb,
-			boolean sendStatus, boolean isService, String attributes, String display, int isPrice, int isVerpatrib,
-			String textTip, int warranty, double stockunits)
+			boolean sendStatus, boolean isService, String attributes, String display, boolean isPrice,
+			boolean isVerpatrib, String textTip, boolean warranty, double stockunits)
 	{
 		productTableStringList = new ArrayList<>();
 		productTableIntegerList = new ArrayList<>();
@@ -159,12 +162,12 @@ public class Product
 		productTableStringList.add(new Pair<String, String>(ID, id));
 	}
 
-	public String getUserId()
+	public int getUserId()
 	{
 		return userId;
 	}
 
-	public void setUserId(String userId)
+	public void setUserId(int userId)
 	{
 		this.userId = userId;
 	}
@@ -389,26 +392,26 @@ public class Product
 		productTableStringList.add(new Pair<String, String>(DISPLAY, display));
 	}
 
-	public int getIsVPrice()
+	public boolean getIsVPrice()
 	{
 		return isVPrice;
 	}
 
-	public void setIsVPrice(int isPrice)
+	public void setIsVPrice(boolean isPrice)
 	{
 		this.isVPrice = isPrice;
-		productTableIntegerList.add(new Pair<String, Integer>(ISVPRICE, isPrice));
+		productTableBooleanList.add(new Pair<String, Boolean>(ISVPRICE, isPrice));
 	}
 
-	public int getIsVerpatrib()
+	public boolean getIsVerpatrib()
 	{
 		return isVerpatrib;
 	}
 
-	public void setIsVerpatrib(int isVerpatrib)
+	public void setIsVerpatrib(boolean isVerpatrib)
 	{
 		this.isVerpatrib = isVerpatrib;
-		productTableIntegerList.add(new Pair<String, Integer>(ISVERPATRIB, isVerpatrib));
+		productTableBooleanList.add(new Pair<String, Boolean>(ISVERPATRIB, isVerpatrib));
 	}
 
 	public String getTextTip()
@@ -422,15 +425,15 @@ public class Product
 		productTableStringList.add(new Pair<String, String>(TEXTTIP, textTip));
 	}
 
-	public int getWarranty()
+	public boolean getWarranty()
 	{
 		return warranty;
 	}
 
-	public void setWarranty(int warranty)
+	public void setWarranty(boolean warranty)
 	{
 		this.warranty = warranty;
-		productTableIntegerList.add(new Pair<String, Integer>(WARRANTY, warranty));
+		productTableBooleanList.add(new Pair<String, Boolean>(WARRANTY, warranty));
 	}
 
 	public double getStockunits()
@@ -446,102 +449,87 @@ public class Product
 
 	// ----------------------------------------------
 
-	public boolean insertRecordIntoDB(String userID)
+	public String insertRecordIntoDB(String userName)
 	{
-
-		String sqlQuery = "INSERT INTO " + DBTables.PRODUCTS.toString() + " (";
-		String colNameList = USER_ID;
-		String colValueList = "?";
-
-		for (int i = 0; i < productTableStringList.size(); i++)
-		{
-			colNameList += ", " + productTableStringList.get(i).getFirst();
-			colValueList += ", '" + productTableStringList.get(i).getSecond() + "'";
-		}
-
-		for (int i = 0; i < productTableIntegerList.size(); i++)
-		{
-			colNameList += ", " + productTableIntegerList.get(i).getFirst();
-			colValueList += ", " + productTableIntegerList.get(i).getSecond().toString();
-		}
-
-		for (int i = 0; i < productTableDoubleList.size(); i++)
-		{
-			colNameList += ", " + productTableDoubleList.get(i).getFirst();
-			colValueList += ", " + productTableDoubleList.get(i).getSecond().toString();
-		}
-
-		for (int i = 0; i < productTableBooleanList.size(); i++)
-		{
-			colNameList += ", " + productTableBooleanList.get(i).getFirst();
-			Integer intValueOfBoolean = productTableBooleanList.get(i).getSecond() ? 1 : 0;
-			colValueList += ", " + intValueOfBoolean.toString();
-		}
-
-		sqlQuery += colNameList + ") " + "VALUES (" + colValueList + ");";
+		String sqlQuery = "INSERT INTO `products`(`ID`, `USER_ID`, `REFERENCE`, `CODE`, `CODETYPE`, "
+				+ "`NAME`, `PRICEBUY`, `PRICESELL`, `CATEGORY`, `TAXCAT`, `ATTRIBUTESET_ID`, `STOCKCOST`, `STOCKVOLUME`, "
+				+ "`IMAGE`, `ISCOM`, `ISSCALE`, `ISKITCHEN`, `PRINTKB`, `SENDSTATUS`, `ISSERVICE`, `ATTRIBUTES`, `DISPLAY`, "
+				+ "`ISVPRICE`, `ISVERPATRIB`, `TEXTTIP`, `WARRANTY`, `STOCKUNITS`) "
+				+ "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 		DBManager dbManager = new DBManager();
 
-		if (!dbManager.validateUserId(userID))
+		if (!dbManager.validateUserName(userName))
 		{
-			return false;
+			return DBResponse.USER_NAME_NOT_VALID.toString();
 		}
 
-		ArrayList<Object> paramList = new ArrayList<>();
-		paramList.add(userID);
+		Integer userNameId = dbManager.getUserNameIdFromName(userName);
+		ArrayList<Object> paramList = getColumnValueList(userNameId);
 
-		return dbManager.executeUpdate(sqlQuery, paramList);
+		ResponseMessage response = new ResponseMessage();
+		dbManager.executeUpdate(sqlQuery, paramList, response);
+
+		return response.getMessage();
 	}
 
-	public boolean updateRecordInDB(String userID)
+	public String updateRecordInDB(String userName)
 	{
-
-		String sqlQuery = "UPDATE " + DBTables.PRODUCTS.toString() + " SET ";
-
-		for (int i = 0; i < productTableStringList.size(); i++)
-		{
-			sqlQuery += productTableStringList.get(i).getFirst() + "=";
-			sqlQuery += "'" + productTableStringList.get(i).getSecond() + "'";
-
-			if (i < (productTableStringList.size() - 1))
-			{
-				sqlQuery += ", ";
-			}
-		}
-
-		for (int i = 0; i < productTableIntegerList.size(); i++)
-		{
-			sqlQuery += ", " + productTableIntegerList.get(i).getFirst() + "=";
-			sqlQuery += productTableIntegerList.get(i).getSecond().toString();
-		}
-
-		for (int i = 0; i < productTableDoubleList.size(); i++)
-		{
-			sqlQuery += ", " + productTableDoubleList.get(i).getFirst() + "=";
-			sqlQuery += productTableDoubleList.get(i).getSecond().toString();
-		}
-
-		for (int i = 0; i < productTableBooleanList.size(); i++)
-		{
-			sqlQuery += ", " + productTableBooleanList.get(i).getFirst() + "=";
-			Integer intValueOfBoolean = productTableBooleanList.get(i).getSecond() ? 1 : 0;
-			sqlQuery += intValueOfBoolean.toString();
-		}
-
-		sqlQuery += " WHERE " + USER_ID + "=? AND " + NAME + "=?;";
+		String sqlQuery = "UPDATE `products` SET `ID`=?,`USER_ID`=?,`REFERENCE`=?,`CODE`=?,`CODETYPE`=?,`NAME`=?,`PRICEBUY`=?,`PRICESELL`=?,"
+				+ "`CATEGORY`=?,`TAXCAT`=?,`ATTRIBUTESET_ID`=?,`STOCKCOST`=?,`STOCKVOLUME`=?,`IMAGE`=?,`ISCOM`=?,`ISSCALE`=?,`ISKITCHEN`=?,"
+				+ "`PRINTKB`=?,`SENDSTATUS`=?,`ISSERVICE`=?,`ATTRIBUTES`=?,`DISPLAY`=?,`ISVPRICE`=?,`ISVERPATRIB`=?,`TEXTTIP`=?,`WARRANTY`=?,"
+				+ "`STOCKUNITS`=? WHERE (`USER_ID`=? AND `ID`=?)";
 
 		DBManager dbManager = new DBManager();
 
-		if (!dbManager.validateUserId(userID))
+		if (!dbManager.validateUserName(userName))
 		{
-			return false;
+			return DBResponse.USER_ID_NOT_VALID.toString();
 		}
 
-		ArrayList<Object> paramList = new ArrayList<>();
-		paramList.add(userID);
-		paramList.add(name);
+		Integer userNameId = dbManager.getUserNameIdFromName(userName);
+		ArrayList<Object> paramList = getColumnValueList(userNameId);
+		paramList.add(UserManager.USER_NAME_ID);
+		paramList.add(id);
 
-		return dbManager.executeUpdate(sqlQuery, paramList);
+		ResponseMessage response = new ResponseMessage();
+		dbManager.executeUpdate(sqlQuery, paramList, response);
+
+		return response.getMessage();
+	}
+
+	private ArrayList<Object> getColumnValueList(int userNameId)
+	{
+		ArrayList<Object> paramList = new ArrayList<>();
+		paramList.add(id);
+		paramList.add(userNameId);
+		paramList.add(reference);
+		paramList.add(code);
+		paramList.add(codetype);
+		paramList.add(name);
+		paramList.add(priceBuy);
+		paramList.add(priceSell);
+		paramList.add(category);
+		paramList.add(taxcat);
+		paramList.add(attributeset_id);
+		paramList.add(stockCost);
+		paramList.add(stockVolume);
+		paramList.add(image);
+		paramList.add(iscom);
+		paramList.add(isScale);
+		paramList.add(isKitchen);
+		paramList.add(printkb);
+		paramList.add(sendStatus);
+		paramList.add(isService);
+		paramList.add(attributes);
+		paramList.add(display);
+		paramList.add(isVPrice);
+		paramList.add(isVerpatrib);
+		paramList.add(textTip);
+		paramList.add(warranty);
+		paramList.add(stockunits);
+
+		return paramList;
 	}
 
 }

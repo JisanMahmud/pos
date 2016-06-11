@@ -19,8 +19,6 @@ import com.inzaana.pos.models.Category;
 @Path("/categories")
 public class CategoryResource
 {
-	final private String	SUCCESS_MSG		= "SUCCESS";
-	final private String	FAILURE_MSG		= "FAILED";
 
 	CategoryManager			categoryManager	= new CategoryManager();
 
@@ -48,12 +46,7 @@ public class CategoryResource
 	@RolesAllowed({ "ADMIN", "POS" })
 	public String addCategory(@PathParam("userName") String userName, Category newCategory)
 	{
-		if (!categoryManager.addCategory(userName, newCategory))
-		{
-			return FAILURE_MSG;
-		}
-
-		return SUCCESS_MSG;
+		return categoryManager.addCategory(userName, newCategory);
 	}
 
 	@POST
@@ -63,12 +56,7 @@ public class CategoryResource
 	public String updateCategory(@PathParam("userName") String userName,
 			Category updatedCategory)
 	{
-		if (!categoryManager.updateCategory(userName, updatedCategory))
-		{
-			return FAILURE_MSG;
-		}
-
-		return SUCCESS_MSG;
+		return categoryManager.updateCategory(userName, updatedCategory);
 	}
 
 	@DELETE
@@ -77,11 +65,6 @@ public class CategoryResource
 	@RolesAllowed({ "ADMIN", "POS" })
 	public String deleteCategory(@PathParam("userName") String userName, @PathParam("categoryId") String categoryId)
 	{
-		if (!categoryManager.deleteCategory(userName, categoryId))
-		{
-			return FAILURE_MSG;
-		}
-
-		return SUCCESS_MSG;
+		return categoryManager.deleteCategory(userName, categoryId);
 	}
 }

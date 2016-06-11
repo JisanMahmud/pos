@@ -22,7 +22,7 @@ public class DBResponsePerser
 		{
 			dbResponse = DBResponse.TABLE_NOT_FOUND;
 		}
-		else if (dbError.contains("Duplicate Entry"))
+		else if (dbError.contains("Duplicate entry"))
 		{
 			dbResponse = DBResponse.DUPLICATE_ENTRY;
 		}

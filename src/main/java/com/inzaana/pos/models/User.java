@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.inzaana.pos.db.DBManager;
 import com.inzaana.pos.utils.DBTables;
 import com.inzaana.pos.utils.Pair;
+import com.inzaana.pos.utils.ResponseMessage;
 
 @XmlRootElement
 public class User implements Principal
@@ -124,7 +125,8 @@ public class User implements Principal
 			return false;
 		}
 
-		return dbManager.executeUpdate(sqlQuery, new ArrayList<Object>());
+		ResponseMessage response = new ResponseMessage();
+		return dbManager.executeUpdate(sqlQuery, new ArrayList<Object>(), response);
 	}
 
 	public boolean updateRecordInDB(String userID)

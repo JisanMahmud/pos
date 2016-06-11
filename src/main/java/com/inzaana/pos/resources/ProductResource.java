@@ -15,14 +15,12 @@ import javax.ws.rs.core.MediaType;
 
 import com.inzaana.pos.managers.ProductManager;
 import com.inzaana.pos.models.Product;
+import com.inzaana.pos.utils.ResponseMessage;
 
 @Path("/products")
 public class ProductResource
 {
-
-	final private String	SUCCESS_MSG		= "SUCCESS";
-	final private String	FAILURE_MSG		= "FAILED";
-
+	ResponseMessage			responseMsg		= new ResponseMessage();
 	ProductManager			productManager	= new ProductManager();
 
 	@GET
@@ -49,40 +47,24 @@ public class ProductResource
 	@RolesAllowed({ "ADMIN", "POS" })
 	public String addNewProduct(@PathParam("userName") String userName, Product newProduct)
 	{
-		if (!productManager.addNewProduct(userName, newProduct))
-		{
-			return FAILURE_MSG;
-		}
-
-		return SUCCESS_MSG;
+		return productManager.addNewProduct(userName, newProduct);
 	}
 
 	@POST
-	@Path("/{userName}/{productName}")
+	@Path("/{userName}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed({ "ADMIN", "POS" })
-	public String updateProduct(@PathParam("userName") String userName, @PathParam("productName") String productName,
-			Product updatedProduct)
+	public String updateProduct(@PathParam("userName") String userName, Product updatedProduct)
 	{
-		if (!productManager.updateProduct(userName, productName, updatedProduct))
-		{
-			return FAILURE_MSG;
-		}
-
-		return SUCCESS_MSG;
+		return productManager.updateProduct(userName, updatedProduct);
 	}
 
 	@DELETE
-	@Path("/{userName}/{productName}")
+	@Path("/{userName}/{productId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed({ "ADMIN", "POS" })
-	public String deleteProduct(@PathParam("userName") String userName, @PathParam("productName") String productName)
+	public String deleteProduct(@PathParam("userName") String userName, @PathParam("productId") String productId)
 	{
-		if (!productManager.deleteProduct(userName, productName))
-		{
-			return FAILURE_MSG;
-		}
-
-		return SUCCESS_MSG;
+		return productManager.deleteProduct(userName, productId);
 	}
 }

@@ -5,7 +5,9 @@ import java.util.List;
 
 import com.inzaana.pos.db.DBManager;
 import com.inzaana.pos.models.Product;
+import com.inzaana.pos.utils.DBResponse;
 import com.inzaana.pos.utils.DBTables;
+import com.inzaana.pos.utils.ResponseMessage;
 
 public class ProductManager
 {
@@ -32,41 +34,50 @@ public class ProductManager
 		return dbManager.getProducts("");
 	}
 
-	public boolean addNewProduct(String userName, Product newProduct)
+	public String addNewProduct(String userName, Product newProduct)
 	{
 		if (!dbManager.canUserDoDBTransaction(userName))
 		{
-			return false;
+			return DBResponse.USER_CAN_NOT_ACCESS_DB.toString();
 		}
 
 		return newProduct.insertRecordIntoDB(userName);
 	}
 
-	public boolean updateProduct(String userName, String productName, Product updatedProduct)
+	public String updateProduct(String userName, Product updatedProduct)
 	{
 		if (!dbManager.canUserDoDBTransaction(userName))
 		{
-			return false;
+			return DBResponse.USER_CAN_NOT_ACCESS_DB.toString();
 		}
 
 		return updatedProduct.updateRecordInDB(userName);
 	}
 
-	public boolean deleteProduct(String userName, String productName)
+	public String deleteProduct(String userName, String productId)
 	{
 		if (!dbManager.canUserDoDBTransaction(userName))
 		{
-			return false;
+			return DBResponse.USER_CAN_NOT_ACCESS_DB.toString();
+		}
+
+		Integer userNameId = dbManager.getUserNameIdFromName(userName);
+		if (userNameId < 0)
+		{
+			return DBResponse.USER_NAME_NOT_VALID.toString();
 		}
 
 		String sqlQuery = "DELETE FROM " + DBTables.PRODUCTS.toString() + " WHERE " + Product.USER_ID + "=? AND "
-				+ Product.NAME + "=?;";
+				+ Product.ID + "=?;";
 
 		ArrayList<Object> paramList = new ArrayList<>();
-		paramList.add(userName);
-		paramList.add(productName);
+		paramList.add(userNameId);
+		paramList.add(productId);
 
-		return dbManager.executeUpdate(sqlQuery, paramList);
+		ResponseMessage response = new ResponseMessage();
+		dbManager.executeUpdate(sqlQuery, paramList, response);
+
+		return response.getMessage();
 	}
 
 }

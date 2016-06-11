@@ -1,20 +1,38 @@
 package com.inzaana.pos.models;
 
+import java.util.ArrayList;
+
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.inzaana.pos.db.DBManager;
+import com.inzaana.pos.utils.DBResponse;
+import com.inzaana.pos.utils.ResponseMessage;
 
 @XmlRootElement
 public class StockDiary
 {
 
-	private String	id;
-	private String	dateNew;
-	private int		reason;
-	private String	location;
-	private String	product;
-	private String	attributeSetInstance_id;
-	private double	units;
-	private double	price;
-	private String	appUser;
+	final static public String	ID						= "ID";
+	final static public String	USER_ID					= "USER_ID";
+	final static public String	DATENEW					= "DATENEW";
+	final static public String	REASON					= "REASON";
+	final static public String	LOCATION				= "LOCATION";
+	final static public String	PRODUCT					= "PRODUCT";
+	final static public String	ATTRIBUTESETINSTANCE_ID	= "ATTRIBUTESETINSTANCE_ID";
+	final static public String	UNITS					= "UNITS";
+	final static public String	PRICE					= "PRICE";
+	final static public String	APPUSER					= "APPUSER";
+
+	private String				id;
+	private int					userId;
+	private String				dateNew;
+	private int					reason;
+	private String				location;
+	private String				product;
+	private String				attributeSetInstance_id;
+	private double				units;
+	private double				price;
+	private String				appUser;
 
 	public StockDiary()
 	{
@@ -54,6 +72,16 @@ public class StockDiary
 	public void setId(String id)
 	{
 		this.id = id;
+	}
+
+	public int getUserId()
+	{
+		return userId;
+	}
+
+	public void setUserId(int userId)
+	{
+		this.userId = userId;
 	}
 
 	public String getDateNew()
@@ -134,6 +162,72 @@ public class StockDiary
 	public void setAppUser(String appUser)
 	{
 		this.appUser = appUser;
+	}
+
+	// ------------------------------------------------------------
+
+	public String insertRecordIntoDB(String userName)
+	{
+		String sqlQuery = "INSERT INTO `stockdiary`(`ID`, `USER_ID`, `DATENEW`, `REASON`, `LOCATION`, `PRODUCT`, "
+				+ "`ATTRIBUTESETINSTANCE_ID`, `UNITS`, `PRICE`, `APPUSER`) VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+		DBManager dbManager = new DBManager();
+
+		if (!dbManager.validateUserName(userName))
+		{
+			return DBResponse.USER_NAME_NOT_VALID.toString();
+		}
+
+		Integer userNameId = dbManager.getUserNameIdFromName(userName);
+		ArrayList<Object> paramList = getColumnValueList(userNameId);
+
+		ResponseMessage response = new ResponseMessage();
+		dbManager.executeUpdate(sqlQuery, paramList, response);
+
+		return response.getMessage();
+
+	}
+
+	public String updateRecordInDB(String userName)
+	{
+		String sqlQuery = "UPDATE `stockdiary` SET `ID`=?,`USER_ID`=?,`DATENEW`=?,`REASON`=?,`LOCATION`=?,`PRODUCT`=?"
+				+ ",`ATTRIBUTESETINSTANCE_ID`=?,`UNITS`=?,`PRICE`=?,`APPUSER`=? WHERE (`USER_ID`=? AND `ID`=?)";
+
+		DBManager dbManager = new DBManager();
+
+		if (!dbManager.validateUserName(userName))
+		{
+			return DBResponse.USER_ID_NOT_VALID.toString();
+		}
+
+		Integer userNameId = dbManager.getUserNameIdFromName(userName);
+
+		ArrayList<Object> paramList = getColumnValueList(userNameId);
+		paramList.add(userNameId);
+		paramList.add(id);
+
+		ResponseMessage response = new ResponseMessage();
+		dbManager.executeUpdate(sqlQuery, paramList, response);
+
+		return response.getMessage();
+
+	}
+
+	private ArrayList<Object> getColumnValueList(int userNameId)
+	{
+		ArrayList<Object> paramList = new ArrayList<>();
+		paramList.add(id);
+		paramList.add(userNameId);
+		paramList.add(dateNew);
+		paramList.add(reason);
+		paramList.add(location);
+		paramList.add(product);
+		paramList.add(attributeSetInstance_id);
+		paramList.add(units);
+		paramList.add(price);
+		paramList.add(appUser);
+
+		return paramList;
 	}
 
 }

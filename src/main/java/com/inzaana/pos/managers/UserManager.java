@@ -7,6 +7,7 @@ import com.inzaana.pos.db.DBManager;
 import com.inzaana.pos.models.User;
 import com.inzaana.pos.utils.DBResponse;
 import com.inzaana.pos.utils.DBTables;
+import com.inzaana.pos.utils.ResponseMessage;
 import com.inzaana.pos.utils.UserRole;
 
 public class UserManager
@@ -18,10 +19,12 @@ public class UserManager
 	public static String	USER_ROLE			= UserRole.GUEST.toString();
 
 	DBManager				dbManager;
+	ResponseMessage 		responseMessage;
 
 	public UserManager()
 	{
 		dbManager = new DBManager();
+		responseMessage = new ResponseMessage();
 	}
 
 	public List<User> getUser(String userName)
@@ -41,7 +44,8 @@ public class UserManager
 		ArrayList<Object> paramList = new ArrayList<>();
 		paramList.add(userName);
 
-		return dbManager.executeUpdate(sqlQuery, paramList);
+		responseMessage.clear();
+		return dbManager.executeUpdate(sqlQuery, paramList, responseMessage);
 	}
 
 	public boolean verifyPassword(String password)
@@ -84,7 +88,8 @@ public class UserManager
 		System.out.println(sqlQuery);
 		System.out.println(paramList.toString());
 		
-		return dbManager.executeUpdate(sqlQuery, paramList);
+		responseMessage.clear();
+		return dbManager.executeUpdate(sqlQuery, paramList, responseMessage);
 	}
 
 	public int getUserNameId(String userId)
@@ -119,7 +124,8 @@ public class UserManager
 		ArrayList<Object> paramList = new ArrayList<>();
 		paramList.add(userId);
 
-		return dbManager.executeUpdate(sqlQuery, paramList);
+		responseMessage.clear();
+		return dbManager.executeUpdate(sqlQuery, paramList, responseMessage);
 	}
 	
 	public boolean deleteUser(String userName)
@@ -134,7 +140,8 @@ public class UserManager
 		ArrayList<Object> paramList = new ArrayList<>();
 		paramList.add(userName);
 
-		return dbManager.executeUpdate(sqlQuery, paramList);
+		responseMessage.clear();
+		return dbManager.executeUpdate(sqlQuery, paramList, responseMessage);
 	}
 
 	public String getUserPassword(String userName)
