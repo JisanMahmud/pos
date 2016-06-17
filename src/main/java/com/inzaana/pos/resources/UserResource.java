@@ -58,10 +58,10 @@ public class UserResource {
 	}
 
 	@PUT
-	@Path("/{userName}")
+	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed({ "ADMIN" })
-	public String addUser(@PathParam("userName") String userName, User newUser)
+	public String addUser(User newUser)
 	{
 		if (!userManager.addNewUser(newUser))
 		{
@@ -72,13 +72,12 @@ public class UserResource {
 	}
 
 	@POST
-	@Path("/{userName}")
+	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed({ "ADMIN" })
-	public String updateUser(@PathParam("userName") String userName,
-			User updatedUser)
+	public String updateUser(User updatedUser)
 	{
-		if (!userManager.updateUser(userName, updatedUser))
+		if (!userManager.updateUser(updatedUser))
 		{
 			return FAILURE_MSG;
 		}

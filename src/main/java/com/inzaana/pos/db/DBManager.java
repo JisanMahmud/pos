@@ -682,10 +682,10 @@ public class DBManager
 	{
 		// Important for sql injection attack
 
-		if (UserManager.USER_NAME_ID < 0)
-		{
-			return false;
-		}
+//		if (UserManager.USER_NAME_ID < 0)
+//		{
+//			return false;
+//		}
 
 		return true;
 	}

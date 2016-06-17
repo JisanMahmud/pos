@@ -3,6 +3,7 @@ package com.inzaana.pos.utils;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import javax.swing.JFrame;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -25,13 +26,7 @@ public class Main
 	{
 		System.out.println("Start Testing");
 		
-		Preferences p = Preferences.userRoot();
-		System.out.println("Key: " + p.get("INZAANA_SECURITY_KEY", "NOT FOUND"));
-		System.out.println("ID: " + p.get("INZAANA_USER_ID", "NOT FOUND"));
-		p.remove("INZAANA_SECURITY_KEY");
-		p.remove("INZAANA_USER_ID");
-		p.remove("INZAANA_USER_NAME");
-		p.remove("INZAANA_URL");
+		
 		
 //		UserManager userManager = new UserManager();
 //		UserManager.USER_ID = "user_id_1";
@@ -44,6 +39,62 @@ public class Main
 //		testProduct();
 
 //		testStock();
+		
+		//testProgressbar();
+		
+		
+		clearInzaanaData();
+	}
+	
+	
+	
+	public static void testProgressbar()
+	{
+		JFrame frame = new JFrame();
+		final InzaanaProgressBar progressBar = new InzaanaProgressBar(frame);
+		progressBar.setModal(true);
+		progressBar.setLocationRelativeTo(null);
+		
+		
+		Runnable runnable = new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				progressBar.setVisible(true);	
+				
+			}
+		};
+		
+		
+		for (int i = 0; i < 100; i++)
+		{
+			progressBar.setProgress(i);
+			progressBar.setStatusMessage("Updating ...");
+			try
+			{
+				Thread.sleep(500);
+			}
+			catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		Thread threadT = new Thread(runnable);
+		   threadT.start();
+		   
+	}
+	
+	public static void clearInzaanaData(){
+		Preferences p = Preferences.userRoot();
+		System.out.println("Key: " + p.get("INZAANA_SECURITY_KEY", "NOT FOUND"));
+		System.out.println("ID: " + p.get("INZAANA_USER_ID", "NOT FOUND"));
+		p.remove("INZAANA_SECURITY_KEY");
+		p.remove("INZAANA_USER_ID");
+		p.remove("INZAANA_USER_NAME");
+		p.remove("INZAANA_URL");
 	}
 	
 	public static void testStock(){
@@ -55,13 +106,18 @@ public class Main
 	}
 	
 	public static void testUser(){
-		DBManager dbManager = new DBManager();
-		System.out.println("Password: " + dbManager.getUserPassword("user_id_1"));
-		System.out.println("Role: " + dbManager.getUserRole("user_id_1"));
-		System.out.println("Name: " + dbManager.getUserName("user_id_3"));
-		System.out.println("Name: " + dbManager.getUserNameFromNameId(2));
-		System.out.println("NameId: " + dbManager.getUserNameId("user_id_4"));
-		System.out.println("NameId: " + dbManager.getUserNameIdFromName("Mahmud"));
+//		DBManager dbManager = new DBManager();
+//		System.out.println("Password: " + dbManager.getUserPassword("user_id_1"));
+//		System.out.println("Role: " + dbManager.getUserRole("user_id_1"));
+//		System.out.println("Name: " + dbManager.getUserName("user_id_3"));
+//		System.out.println("Name: " + dbManager.getUserNameFromNameId(2));
+//		System.out.println("NameId: " + dbManager.getUserNameId("user_id_4"));
+//		System.out.println("NameId: " + dbManager.getUserNameIdFromName("Mahmud"));
+		
+		User user = new User("John", "John_user_id_2", "***@@@***NEW_USER_PASSWORD***@@@***", "POS");
+		
+		UserManager userManager = new UserManager();
+		userManager.addNewUser(user);
 	}
 
 	public static void testProduct()

@@ -104,10 +104,50 @@ public class UserManager
 
 	public boolean addNewUser(User newUser)
 	{
-		return newUser.insertRecordIntoDB();
+		
+		if (!dbManager.validateUserName(newUser.getName()))
+		{
+			return false;
+		}
+		
+		int userNameId = dbManager.getUserNameIdFromName(newUser.getName());
+		ResponseMessage response = new ResponseMessage();
+		
+		if (userNameId < 0)
+		{
+			String sql = "INSERT INTO `username`(`NAME`) VALUES (?)";
+			ArrayList<Object> paramList = new ArrayList<Object>();
+			paramList.add(newUser.getName());	
+			
+			if (!dbManager.executeUpdate(sql, paramList, response))
+			{
+				return false;
+			}
+			
+			userNameId = dbManager.getUserNameIdFromName(newUser.getName());
+			
+			if (userNameId < 0)
+			{
+				return false;
+			}	
+		}
+		
+		String sql = "INSERT INTO `users`(`USER_ID`, `NAME`, `PASSWORD`, `ROLE`) VALUES (?,?,?,?)";
+		ArrayList<Object> paramList = new ArrayList<Object>();
+		paramList.add(newUser.GetUserId());
+		paramList.add(userNameId);
+		paramList.add(newUser.GetUserPassword());
+		paramList.add(newUser.GetUserRole());
+		
+		if (!dbManager.executeUpdate(sql, paramList, response))
+		{
+			return false;
+		}
+		
+		return true;
 	}
 
-	public boolean updateUser(String userId, User updatedUser)
+	public boolean updateUser(User updatedUser)
 	{
 		return false;
 	}
