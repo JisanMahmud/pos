@@ -31,10 +31,10 @@ public class DBManager
 	private final String	DB_USER_NAME		= "root";
 	private final String	DB_PASS				= "";
 
-	Connection				dbConnection		= null;
-	Statement				dbStatement			= null;
-	PreparedStatement		preparedStatement	= null;
-	ResultSet				resultSet			= null;
+//	Connection				dbConnection		= null;
+//	Statement				dbStatement			= null;
+//	PreparedStatement		preparedStatement	= null;
+//	ResultSet				resultSet			= null;
 
 	public DBManager()
 	{
@@ -45,10 +45,15 @@ public class DBManager
 		boolean success = true;
 		response.clear();
 
+		Connection				dbConnection		= null;
+		Statement				dbStatement			= null;
+		PreparedStatement		preparedStatement	= null;
+		ResultSet				resultSet			= null;
+		
 		try
 		{
 			Class.forName(JDBC_DRIVER);
-			System.out.println("Connecting to database...");
+			System.out.println("[TEST]Connecting to database...");
 			dbConnection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASS);
 
 			preparedStatement = dbConnection.prepareStatement(sqlQuery);
@@ -76,7 +81,7 @@ public class DBManager
 		}
 		finally
 		{
-			closeConnection();
+			closeConnection(resultSet, preparedStatement, dbConnection);
 		}
 
 		if (success)
@@ -112,6 +117,11 @@ public class DBManager
 		{
 			sqlQuery += " WHERE USER_ID = ?";
 		}
+		
+		Connection				dbConnection		= null;
+		Statement				dbStatement			= null;
+		PreparedStatement		preparedStatement	= null;
+		ResultSet				resultSet			= null;
 
 		try
 		{
@@ -150,7 +160,7 @@ public class DBManager
 		}
 		finally
 		{
-			closeConnection();
+			closeConnection(resultSet, preparedStatement, dbConnection);
 		}
 
 		return categoryList;
@@ -178,6 +188,11 @@ public class DBManager
 			sqlQuery += " WHERE USER_ID = ?";
 		}
 
+		Connection				dbConnection		= null;
+		Statement				dbStatement			= null;
+		PreparedStatement		preparedStatement	= null;
+		ResultSet				resultSet			= null;
+		
 		try
 		{
 			Class.forName(JDBC_DRIVER);
@@ -235,7 +250,7 @@ public class DBManager
 		}
 		finally
 		{
-			closeConnection();
+			closeConnection(resultSet, preparedStatement, dbConnection);
 		}
 
 		return productList;
@@ -256,6 +271,11 @@ public class DBManager
 		{
 			sqlQuery += " WHERE USER_ID = ?";
 		}
+		
+		Connection				dbConnection		= null;
+		Statement				dbStatement			= null;
+		PreparedStatement		preparedStatement	= null;
+		ResultSet				resultSet			= null;
 
 		try
 		{
@@ -287,7 +307,7 @@ public class DBManager
 		}
 		finally
 		{
-			closeConnection();
+			closeConnection(resultSet, preparedStatement, dbConnection);
 		}
 
 		return paymentList;
@@ -317,6 +337,11 @@ public class DBManager
 			sqlQuery += " WHERE USER_ID = ?";
 		}
 
+		Connection				dbConnection		= null;
+		Statement				dbStatement			= null;
+		PreparedStatement		preparedStatement	= null;
+		ResultSet				resultSet			= null;
+		
 		try
 		{
 			Class.forName(JDBC_DRIVER);
@@ -358,7 +383,7 @@ public class DBManager
 		}
 		finally
 		{
-			closeConnection();
+			closeConnection(resultSet, preparedStatement, dbConnection);
 		}
 
 		return stockList;
@@ -376,6 +401,11 @@ public class DBManager
 		String sqlQuery = "SELECT * FROM " + DBTables.USERNAME.toString();
 		sqlQuery += " WHERE NAME = ?";
 
+		Connection				dbConnection		= null;
+		Statement				dbStatement			= null;
+		PreparedStatement		preparedStatement	= null;
+		ResultSet				resultSet			= null;
+		
 		try
 		{
 			Class.forName(JDBC_DRIVER);
@@ -401,7 +431,7 @@ public class DBManager
 		}
 		finally
 		{
-			closeConnection();
+			closeConnection(resultSet, preparedStatement, dbConnection);
 		}
 
 		return userNameId;
@@ -413,6 +443,11 @@ public class DBManager
 
 		String sqlQuery = "SELECT * FROM " + DBTables.USERNAME.toString() + " WHERE ID = ?";
 
+		Connection				dbConnection		= null;
+		Statement				dbStatement			= null;
+		PreparedStatement		preparedStatement	= null;
+		ResultSet				resultSet			= null;
+		
 		try
 		{
 			Class.forName(JDBC_DRIVER);
@@ -438,7 +473,7 @@ public class DBManager
 		}
 		finally
 		{
-			closeConnection();
+			closeConnection(resultSet, preparedStatement, dbConnection);
 		}
 
 		return userName;
@@ -455,6 +490,11 @@ public class DBManager
 
 		String sqlQuery = "SELECT * FROM " + DBTables.USERS.toString() + " WHERE USER_ID = ?";
 
+		Connection				dbConnection		= null;
+		Statement				dbStatement			= null;
+		PreparedStatement		preparedStatement	= null;
+		ResultSet				resultSet			= null;
+		
 		try
 		{
 			Class.forName(JDBC_DRIVER);
@@ -480,7 +520,7 @@ public class DBManager
 		}
 		finally
 		{
-			closeConnection();
+			closeConnection(resultSet, preparedStatement, dbConnection);
 		}
 
 		return userNameId;
@@ -502,6 +542,11 @@ public class DBManager
 		{
 			return DBResponse.FAILURE.toString();
 		}
+		
+		Connection				dbConnection		= null;
+		Statement				dbStatement			= null;
+		PreparedStatement		preparedStatement	= null;
+		ResultSet				resultSet			= null;
 
 		try
 		{
@@ -528,7 +573,7 @@ public class DBManager
 		}
 		finally
 		{
-			closeConnection();
+			closeConnection(resultSet, preparedStatement, dbConnection);
 		}
 
 		return userName;
@@ -543,32 +588,57 @@ public class DBManager
 			return userList;
 		}
 
-		int userNameId = getUserNameIdFromName(userName);
+		int userNameId = -5555;
 
-		String sqlQuery = "SELECT * FROM " + DBTables.USERS.toString() + " WHERE NAME = ?";
-		if (userNameId < 0)
+		String sqlQuery = "SELECT * FROM " + DBTables.USERS.toString();
+		
+		if (!userName.isEmpty())
 		{
-
-			return userList;
+			if (!validateUserName(userName))
+			{
+				return userList;
+			}
+			
+			userNameId = getUserNameIdFromName(userName);
+			
+			if (userNameId < 0)
+			{
+				return userList;
+			}
+			
+			sqlQuery += " WHERE NAME = ?";
 		}
 
+
+		Connection				dbConnection		= null;
+		Statement				dbStatement			= null;
+		PreparedStatement		preparedStatement	= null;
+		ResultSet				resultSet			= null;
+		
 		try
 		{
 			Class.forName(JDBC_DRIVER);
 			System.out.println("Connecting to database...");
 			dbConnection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASS);
 			preparedStatement = dbConnection.prepareStatement(sqlQuery);
-			preparedStatement.setInt(1, userNameId);
+			if (!userName.isEmpty())
+			{
+				preparedStatement.setInt(1, userNameId);
+			}
 
 			resultSet = preparedStatement.executeQuery();
 
 			while (resultSet.next())
 			{
 				User user = new User();
-				user.SetUserName(userName);
-				user.SetUserId(resultSet.getString(User.USER_ID));
-				user.SetUserPassword(resultSet.getString(User.PASSWORD));
-				user.SetUserRole(resultSet.getString(User.ROLE));
+				user.setUserName(getUserNameFromNameId(Integer.valueOf(resultSet.getString(User.NAME))));
+				System.out.println("NAME: " + user.getName());
+				user.setUserId(resultSet.getString(User.USER_ID));
+				System.out.println("ID: " + user.getUserId());
+				user.setUserPassword(resultSet.getString(User.PASSWORD));
+				System.out.println("PASS: " + user.getUserPassword());
+				user.setUserRole(resultSet.getString(User.ROLE));
+				System.out.println("ROLE: " + user.getUserRole());
 				userList.add(user);
 			}
 		}
@@ -581,8 +651,8 @@ public class DBManager
 			e.printStackTrace();
 		}
 		finally
-		{
-			closeConnection();
+		{	
+			closeConnection(resultSet, preparedStatement, dbConnection);
 		}
 
 		return userList;
@@ -599,6 +669,11 @@ public class DBManager
 
 		String sqlQuery = "SELECT password FROM " + DBTables.USERS.toString() + " WHERE user_id = ?";
 
+		Connection				dbConnection		= null;
+		Statement				dbStatement			= null;
+		PreparedStatement		preparedStatement	= null;
+		ResultSet				resultSet			= null;
+		
 		try
 		{
 			Class.forName(JDBC_DRIVER);
@@ -624,7 +699,7 @@ public class DBManager
 		}
 		finally
 		{
-			closeConnection();
+			closeConnection(resultSet, preparedStatement, dbConnection);
 		}
 
 		return password;
@@ -641,6 +716,11 @@ public class DBManager
 
 		String sqlQuery = "SELECT role FROM " + DBTables.USERS.toString() + " WHERE user_id = ?";
 
+		Connection				dbConnection		= null;
+		Statement				dbStatement			= null;
+		PreparedStatement		preparedStatement	= null;
+		ResultSet				resultSet			= null;
+		
 		try
 		{
 			Class.forName(JDBC_DRIVER);
@@ -666,7 +746,7 @@ public class DBManager
 		}
 		finally
 		{
-			closeConnection();
+			closeConnection(resultSet, preparedStatement, dbConnection);
 		}
 
 		return userRole;
@@ -702,7 +782,7 @@ public class DBManager
 		return false;
 	}
 
-	private void closeConnection()
+	private void closeConnection(ResultSet resultSet, PreparedStatement preparedStatement, Connection dbConnection)
 	{
 		try
 		{

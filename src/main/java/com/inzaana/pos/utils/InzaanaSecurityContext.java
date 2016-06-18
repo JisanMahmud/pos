@@ -23,8 +23,8 @@ public class InzaanaSecurityContext implements SecurityContext {
 
 	@Override
 	public boolean isUserInRole(String s) {
-		if (user.GetUserRole() != null) {
-			return user.GetUserRole().equals(s);
+		if (user.getUserRole() != null) {
+			return user.getUserRole().equals(s);
 		}
 		return false;
 	}

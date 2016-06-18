@@ -134,10 +134,10 @@ public class UserManager
 		
 		String sql = "INSERT INTO `users`(`USER_ID`, `NAME`, `PASSWORD`, `ROLE`) VALUES (?,?,?,?)";
 		ArrayList<Object> paramList = new ArrayList<Object>();
-		paramList.add(newUser.GetUserId());
+		paramList.add(newUser.getUserId());
 		paramList.add(userNameId);
-		paramList.add(newUser.GetUserPassword());
-		paramList.add(newUser.GetUserRole());
+		paramList.add(newUser.getUserPassword());
+		paramList.add(newUser.getUserRole());
 		
 		if (!dbManager.executeUpdate(sql, paramList, response))
 		{

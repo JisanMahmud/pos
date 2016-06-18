@@ -24,15 +24,13 @@ public class User implements Principal
 	private String							userPassword;
 	private String							userRole;
 
-	private ArrayList<Pair<String, String>>	userTableStringList;
 
 	public User(String userName, String userId, String userPassword, String userRole)
 	{
-		userTableStringList = new ArrayList<>();
-		this.SetUserName(userName);
-		this.SetUserId(userId);
-		this.SetUserPassword(userPassword);
-		this.SetUserRole(userRole);
+		this.setUserName(userName);
+		this.setUserId(userId);
+		this.setUserPassword(userPassword);
+		this.setUserRole(userRole);
 		
 		System.out.println("USER NAME: " + userName);
 		System.out.println("USER ID: " + userId);
@@ -42,7 +40,6 @@ public class User implements Principal
 
 	public User()
 	{
-		userTableStringList = new ArrayList<>();
 	}
 
 	@Override
@@ -51,82 +48,44 @@ public class User implements Principal
 		return userName;
 	}
 
-	public String GetUserName()
+	public String getUserName()
 	{
 		return userName;
 	}
 
-	public void SetUserName(String userName)
+	public void setUserName(String userName)
 	{
 		this.userName = userName;
-		userTableStringList.add(new Pair<String, String>(NAME, userName));
 	}
 
-	public String GetUserId()
+	public String getUserId()
 	{
 		return userId;
 	}
 
-	public void SetUserId(String userId)
+	public void setUserId(String userId)
 	{
 		this.userId = userId;
-		userTableStringList.add(new Pair<String, String>(USER_ID, userId));
 	}
 
-	public String GetUserPassword()
+	public String getUserPassword()
 	{
 		return userPassword;
 	}
 
-	public void SetUserPassword(String userPassword)
+	public void setUserPassword(String userPassword)
 	{
 		this.userPassword = userPassword;
-		userTableStringList.add(new Pair<String, String>(PASSWORD, userPassword));
 	}
 
-	public String GetUserRole()
+	public String getUserRole()
 	{
 		return userRole;
 	}
 
-	public void SetUserRole(String userRole)
+	public void setUserRole(String userRole)
 	{
 		this.userRole = userRole;
-		userTableStringList.add(new Pair<String, String>(ROLE, userRole));
-	}
-
-	// ------------------------------------------------------------
-
-	public boolean insertRecordIntoDB()
-	{
-
-		String sqlQuery = "INSERT INTO " + DBTables.USERS.toString() + " (";
-		String colNameList = "";
-		String colValueList = "";
-
-		for (int i = 0; i < userTableStringList.size(); i++)
-		{
-			colNameList += userTableStringList.get(i).getFirst();
-			colValueList += "'" + userTableStringList.get(i).getSecond() + "'";
-
-			if (i < (userTableStringList.size() - 1))
-			{
-				colNameList += ", ";
-				colValueList += ", ";
-			}
-		}
-
-		sqlQuery += colNameList + ") " + "VALUES (" + colValueList + ");";
-
-		DBManager dbManager = new DBManager();
-
-		if (!dbManager.canUserDoDBTransaction(getName()))
-		{
-			return false;
-		}
-
-		ResponseMessage response = new ResponseMessage();
-		return dbManager.executeUpdate(sqlQuery, new ArrayList<Object>(), response);
 	}
 
 	public boolean updateRecordInDB(String userID)
