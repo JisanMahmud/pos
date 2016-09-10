@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.inzaana.pos.db.DBManager;
 import com.inzaana.pos.utils.DBResponse;
+import com.inzaana.pos.utils.DBTables;
 import com.inzaana.pos.utils.ResponseMessage;
 
 @XmlRootElement
@@ -168,7 +169,7 @@ public class StockDiary
 
 	public String insertRecordIntoDB(String userName)
 	{
-		String sqlQuery = "INSERT INTO `stockdiary`(`ID`, `USER_ID`, `DATENEW`, `REASON`, `LOCATION`, `PRODUCT`, "
+		String sqlQuery = "INSERT INTO " + DBTables.STOCKDIARY.toString() + "(`ID`, `USER_ID`, `DATENEW`, `REASON`, `LOCATION`, `PRODUCT`, "
 				+ "`ATTRIBUTESETINSTANCE_ID`, `UNITS`, `PRICE`, `APPUSER`) VALUES (?,?,?,?,?,?,?,?,?,?)";
 
 		DBManager dbManager = new DBManager();
@@ -190,7 +191,7 @@ public class StockDiary
 
 	public String updateRecordInDB(String userName)
 	{
-		String sqlQuery = "UPDATE `stockdiary` SET `ID`=?,`USER_ID`=?,`DATENEW`=?,`REASON`=?,`LOCATION`=?,`PRODUCT`=?"
+		String sqlQuery = "UPDATE " + DBTables.STOCKDIARY.toString() + " SET `ID`=?,`USER_ID`=?,`DATENEW`=?,`REASON`=?,`LOCATION`=?,`PRODUCT`=?"
 				+ ",`ATTRIBUTESETINSTANCE_ID`=?,`UNITS`=?,`PRICE`=?,`APPUSER`=? WHERE (`USER_ID`=? AND `ID`=?)";
 
 		DBManager dbManager = new DBManager();

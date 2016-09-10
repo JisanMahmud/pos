@@ -1,5 +1,9 @@
 package com.inzaana.pos.utils;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
@@ -29,8 +33,8 @@ public class Main
 		
 		
 //		UserManager userManager = new UserManager();
-//		UserManager.USER_ID = "user_id_1";
-//		userManager.verifyPassword("1234");
+//		UserManager.USER_ID = "super_admin";
+//		userManager.verifyPassword("Iut2008");
 		
 		//	testProduct();
 		// testDBAccess();
@@ -43,9 +47,28 @@ public class Main
 		//testProgressbar();
 		
 		
-		clearInzaanaData();
+		//clearInzaanaData();
+		
+		testUserResource();
+		
 	}
 	
+	
+	public static void testUserResource()
+	{
+		System.out.println("testUserResource");
+		
+		UserManager userManager = new UserManager();
+		UserManager.USER_ID = "super_admin";
+		userManager.verifyPassword("Iut2008");
+		
+		User newUser = new User("TestUser", "user_2", "pass", "POS");
+		
+		if (userManager.deleteUser("TestUser"))
+			System.out.println("true");
+		else
+			System.out.println("false");
+	}
 	
 	
 	public static void testProgressbar()

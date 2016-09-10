@@ -148,7 +148,7 @@ public class Category
 		System.out.println("[TEST] tip: " + textTip);
 		
 		
-		String sqlQuery = "INSERT INTO `categories`(`ID`, `USER_ID`, `NAME`, `PARENTID`, `IMAGE`, `TEXTTIP`, `CATSHOWNAME`) "
+		String sqlQuery = "INSERT INTO " + DBTables.CATEGORIES.toString() + "(`ID`, `USER_ID`, `NAME`, `PARENTID`, `IMAGE`, `TEXTTIP`, `CATSHOWNAME`) "
 				+ "VALUES (?,?,?,?,?,?,?)";
 
 		DBManager dbManager = new DBManager();
@@ -170,7 +170,7 @@ public class Category
 
 	public String updateRecordInDB(String userName)
 	{
-		String sqlQuery = "UPDATE `categories` SET `ID`=?,`USER_ID`=?,`NAME`=?,`PARENTID`=?,`IMAGE`=?,"
+		String sqlQuery = "UPDATE " + DBTables.CATEGORIES.toString() + " SET `ID`=?,`USER_ID`=?,`NAME`=?,`PARENTID`=?,`IMAGE`=?,"
 				+ "`TEXTTIP`=?,`CATSHOWNAME`=? WHERE (`USER_ID`=? AND `ID`=?)";
 
 		DBManager dbManager = new DBManager();

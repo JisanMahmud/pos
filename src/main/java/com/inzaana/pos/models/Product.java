@@ -451,7 +451,7 @@ public class Product
 
 	public String insertRecordIntoDB(String userName)
 	{
-		String sqlQuery = "INSERT INTO `products`(`ID`, `USER_ID`, `REFERENCE`, `CODE`, `CODETYPE`, "
+		String sqlQuery = "INSERT INTO " + DBTables.PRODUCTS.toString() + "(`ID`, `USER_ID`, `REFERENCE`, `CODE`, `CODETYPE`, "
 				+ "`NAME`, `PRICEBUY`, `PRICESELL`, `CATEGORY`, `TAXCAT`, `ATTRIBUTESET_ID`, `STOCKCOST`, `STOCKVOLUME`, "
 				+ "`IMAGE`, `ISCOM`, `ISSCALE`, `ISKITCHEN`, `PRINTKB`, `SENDSTATUS`, `ISSERVICE`, `ATTRIBUTES`, `DISPLAY`, "
 				+ "`ISVPRICE`, `ISVERPATRIB`, `TEXTTIP`, `WARRANTY`, `STOCKUNITS`) "
@@ -475,7 +475,7 @@ public class Product
 
 	public String updateRecordInDB(String userName)
 	{
-		String sqlQuery = "UPDATE `products` SET `ID`=?,`USER_ID`=?,`REFERENCE`=?,`CODE`=?,`CODETYPE`=?,`NAME`=?,`PRICEBUY`=?,`PRICESELL`=?,"
+		String sqlQuery = "UPDATE " + DBTables.PRODUCTS.toString() + " SET `ID`=?,`USER_ID`=?,`REFERENCE`=?,`CODE`=?,`CODETYPE`=?,`NAME`=?,`PRICEBUY`=?,`PRICESELL`=?,"
 				+ "`CATEGORY`=?,`TAXCAT`=?,`ATTRIBUTESET_ID`=?,`STOCKCOST`=?,`STOCKVOLUME`=?,`IMAGE`=?,`ISCOM`=?,`ISSCALE`=?,`ISKITCHEN`=?,"
 				+ "`PRINTKB`=?,`SENDSTATUS`=?,`ISSERVICE`=?,`ATTRIBUTES`=?,`DISPLAY`=?,`ISVPRICE`=?,`ISVERPATRIB`=?,`TEXTTIP`=?,`WARRANTY`=?,"
 				+ "`STOCKUNITS`=? WHERE (`USER_ID`=? AND `ID`=?)";

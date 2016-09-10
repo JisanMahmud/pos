@@ -19,6 +19,7 @@ import com.inzaana.pos.models.User;
 import com.inzaana.pos.utils.DBResponse;
 import com.inzaana.pos.utils.DBResponsePerser;
 import com.inzaana.pos.utils.DBTables;
+import com.inzaana.pos.utils.POSConfig;
 import com.inzaana.pos.utils.ResponseMessage;
 import com.inzaana.pos.utils.UserRole;
 
@@ -26,15 +27,10 @@ public class DBManager
 {
 
 	// JDBC driver name and database URL
-	private final String	JDBC_DRIVER			= "com.mysql.jdbc.Driver";
-	private final String	DB_URL				= "jdbc:mysql://localhost:3306/inzaanaposservice";
-	private final String	DB_USER_NAME		= "root";
-	private final String	DB_PASS				= "";
-
-//	Connection				dbConnection		= null;
-//	Statement				dbStatement			= null;
-//	PreparedStatement		preparedStatement	= null;
-//	ResultSet				resultSet			= null;
+	private final String	JDBC_DRIVER			= POSConfig.JDBC_DRIVER;
+	private final String	DB_URL				= POSConfig.DB_URL;
+	private final String	DB_USER_NAME		= POSConfig.DB_USER_NAME;
+	private final String	DB_PASS				= POSConfig.DB_PASS;
 
 	public DBManager()
 	{

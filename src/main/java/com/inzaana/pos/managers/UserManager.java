@@ -115,7 +115,7 @@ public class UserManager
 		
 		if (userNameId < 0)
 		{
-			String sql = "INSERT INTO `username`(`NAME`) VALUES (?)";
+			String sql = "INSERT INTO " + DBTables.USERNAME.toString() + "(`NAME`) VALUES (?)";
 			ArrayList<Object> paramList = new ArrayList<Object>();
 			paramList.add(newUser.getName());	
 			
@@ -132,11 +132,11 @@ public class UserManager
 			}	
 		}
 		
-		String sql = "INSERT INTO `users`(`USER_ID`, `NAME`, `PASSWORD`, `ROLE`) VALUES (?,?,?,?)";
+		String sql = "INSERT INTO " + DBTables.USERS.toString() + "(`USER_ID`, `NAME`, `PASSWORD`, `ROLE`) VALUES (?,?,?,?)";
 		ArrayList<Object> paramList = new ArrayList<Object>();
 		paramList.add(newUser.getUserId());
 		paramList.add(userNameId);
-		paramList.add(newUser.getUserPassword());
+		paramList.add(UserManager.NEW_USER_PASSWORD);
 		paramList.add(newUser.getUserRole());
 		
 		if (!dbManager.executeUpdate(sql, paramList, response))

@@ -86,12 +86,26 @@ public class UserResource {
 	}
 
 	@DELETE
-	@Path("/{userName}}")
+	@Path("/{userName}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@RolesAllowed({ "ADMIN" })
 	public String deleteUser(@PathParam("userName") String userName)
 	{
 		if (!userManager.deleteUser(userName))
+		{
+			return FAILURE_MSG;
+		}
+
+		return SUCCESS_MSG;
+	}
+	
+	@DELETE
+	@Path("/id/{userId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@RolesAllowed({ "ADMIN" })
+	public String deleteUserId(@PathParam("userId") String userId)
+	{
+		if (!userManager.deleteUserId(userId))
 		{
 			return FAILURE_MSG;
 		}
