@@ -30,6 +30,13 @@ public class EmailManager {
 
 	public static boolean sendEmail(EmailContent emailContent,
 			ResponseMessage response) {
+		
+		if (emailContent == null)
+		{
+			response.setMessage("Email Content is Empty.");
+			return false;
+		}
+		
 		String userEmail = emailContent.getUserEmail();
 
 		if (!isValidEmailAddress(userEmail)) {
@@ -128,40 +135,6 @@ public class EmailManager {
 
 		sendEmail(content, response);
 		System.out.println(response.getMessage());
-
-		// Properties properties = System.getProperties();
-		// properties.put("mail.smtp.host", MAIL_HOST);
-		// properties.put("mail.smtp.port", MAIL_PORT);
-		// properties.put("mail.transport.protocol", MAIL_PROTOCOL);
-		// properties.put("mail.smtp.ssl.enable", MAIL_SSL_ENABLED);
-		// properties.put("mail.smtp.ssl.trust", MAIL_HOST);
-		// properties.put("mail.smtp.socketFactory.class", MAIL_SOCKET_FACTORY);
-		// properties.put("mail.smtp.socketFactory.port", MAIL_PORT);
-		// properties.put("mail.smtp.auth", MAIL_AUTH_ENABLED);
-		// properties.put("mail.smtp.starttls.enable", MAIL_TLS_ENABLED);
-		//
-		// Authenticator auth = new Authenticator() {
-		// protected PasswordAuthentication getPasswordAuthentication() {
-		// return new PasswordAuthentication(MAIL_USER_NAME, MAIL_USER_PASS);
-		// }
-		// };
-		//
-		// Session session = Session.getDefaultInstance(properties, auth);
-		// session.setDebug(true);
-		//
-		// try {
-		// MimeMessage message = new MimeMessage(session);
-		// message.setFrom(new InternetAddress(MAIL_USER_NAME));
-		// message.addRecipient(Message.RecipientType.TO, new
-		// InternetAddress(to));
-		// message.setSubject("This is the Subject Line!");
-		// message.setText("This is actual message");
-		// System.out.println("Sending Message");
-		// Transport.send(message);
-		// System.out.println("Sent message successfully....");
-		// } catch (MessagingException mex) {
-		// mex.printStackTrace();
-		// }
 	}
 
 }

@@ -10,8 +10,8 @@ public class EmailContent
 	private String				userAddress;
 	private String				userEmail;
 	private String				userPhoneNumber;
-	private int					totalPrice;
-	private int					totalPaid;
+	private double					totalPrice;
+	private double					totalPaid;
 	
 	public EmailContent()
 	{
@@ -28,7 +28,7 @@ public class EmailContent
 	 * @param totalPaid
 	 */
 	public EmailContent(String companyName, String userName, String userAddress, String userEmail,
-			String userPhoneNumber, int totalPrice, int totalPaid) {
+			String userPhoneNumber, double totalPrice, double totalPaid) {
 		super();
 		this.companyName = companyName;
 		this.userName = userName;
@@ -112,7 +112,7 @@ public class EmailContent
 	/**
 	 * @return the totalPrice
 	 */
-	public int getTotalPrice() {
+	public double getTotalPrice() {
 		return totalPrice;
 	}
 
@@ -126,7 +126,7 @@ public class EmailContent
 	/**
 	 * @return the totalPaid
 	 */
-	public int getTotalPaid() {
+	public double getTotalPaid() {
 		return totalPaid;
 	}
 
