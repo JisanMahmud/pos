@@ -30,13 +30,16 @@ public class UtilityResource {
 	@RolesAllowed({ "ADMIN", "POS" })
 	public String sendEmail(EmailContent emailContent)
 	{
+		//System.out.println("[Jisan_TEST]Total Price: " + String.valueOf(emailContent.getTotalPrice()));
+		//System.out.println("[Jisan_TEST]Total Paid: " + String.valueOf(emailContent.getTotalPaid()));
+		
 		EmailManager emailManager = new EmailManager();
 		if (!emailManager.sendEmail(emailContent, response))
 		{
-			return response.getMessage();
+			return FAILURE_MSG + "_" + response.getMessage();
 		}
 		
-		return SUCCESS_MSG;
+		return SUCCESS_MSG + "_" + response.getMessage();
 	}
 	
 	@PUT
@@ -48,9 +51,9 @@ public class UtilityResource {
 		SmsManager smsManager = new SmsManager();
 		if (!smsManager.sendSms(smsContent, response))
 		{
-			return response.getMessage();
+			return FAILURE_MSG + "_" + response.getMessage();
 		}
 		
-		return SUCCESS_MSG;
+		return SUCCESS_MSG + "_" + response.getMessage();
 	}
 }

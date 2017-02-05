@@ -37,6 +37,9 @@ public class EmailContent
 		this.userPhoneNumber = userPhoneNumber;
 		this.totalPrice = totalPrice;
 		this.totalPaid = totalPaid;
+		
+		System.out.println("[Jisan]Total Price: " + String.valueOf(this.totalPrice));
+		System.out.println("[Jisan]Total Paid: " + String.valueOf(this.totalPaid));
 	}
 
 	/**
@@ -119,7 +122,7 @@ public class EmailContent
 	/**
 	 * @param totalPrice the totalPrice to set
 	 */
-	public void setTotalPrice(int totalPrice) {
+	public void setTotalPrice(double totalPrice) {
 		this.totalPrice = totalPrice;
 	}
 
@@ -133,7 +136,7 @@ public class EmailContent
 	/**
 	 * @param totalPaid the totalPaid to set
 	 */
-	public void setTotalPaid(int totalPaid) {
+	public void setTotalPaid(double totalPaid) {
 		this.totalPaid = totalPaid;
 	}
 }

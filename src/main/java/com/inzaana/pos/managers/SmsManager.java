@@ -13,6 +13,7 @@ import org.glassfish.jersey.filter.LoggingFilter;
 
 import com.inzaana.pos.models.EmailContent;
 import com.inzaana.pos.utils.ResponseMessage;
+import com.inzaana.pos.utils.Utility;
 
 public class SmsManager {
 	
@@ -22,7 +23,7 @@ public class SmsManager {
 	}
 	
 	public static boolean sendSms(EmailContent smsContent, ResponseMessage response)
-	{
+	{	
 		if (smsContent == null)
 		{
 			response.setMessage("Sms Content is Empty.");
@@ -85,10 +86,12 @@ public class SmsManager {
 	
 	private static String getSmsBody(EmailContent smsContent) {
 		String smsBody = smsContent.getCompanyName() + ". Payment Received. ";
-		smsBody += "Paid: Rs. " + smsContent.getTotalPaid()
+		smsBody += "Total: Rs. " + Utility.round(smsContent.getTotalPrice(), 2)
+				+ ". ";
+		smsBody += "Paid: Rs. " + Utility.round(smsContent.getTotalPaid(), 2)
 				+ ". ";
 		smsBody += "Returned: Rs. "
-				+ (smsContent.getTotalPaid() - smsContent.getTotalPrice())
+				+ Math.abs(Utility.round(smsContent.getTotalPaid() - smsContent.getTotalPrice(),2))
 				+ ".";
 
 		return smsBody;
@@ -98,7 +101,7 @@ public class SmsManager {
 		System.out.println("Sending Sms");
 		
 		EmailContent content = new EmailContent("SixtyNine", "Jisan Mahmud",
-				"Farmgate", "jisanmahmud69@gmail.com", "9829929797", 50, 100);
+				"Farmgate", "jisanmahmud69@gmail.com", "9829929797", 500, 100);
 		ResponseMessage response = new ResponseMessage();
 
 		System.out.println(getUrlForSmsProvider(content));

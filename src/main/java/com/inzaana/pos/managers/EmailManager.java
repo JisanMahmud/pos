@@ -14,6 +14,7 @@ import javax.mail.internet.MimeMessage;
 
 import com.inzaana.pos.models.EmailContent;
 import com.inzaana.pos.utils.ResponseMessage;
+import com.inzaana.pos.utils.Utility;
 
 public class EmailManager {
 
@@ -102,12 +103,12 @@ public class EmailManager {
 		emailbody += "<h4>Phone   : " + emailContent.getUserPhoneNumber()
 				+ "</h4> </br>";
 		emailbody += "</br></br>";
-		emailbody += "<h3>Total Price : Rs. " + emailContent.getTotalPrice()
+		emailbody += "<h3>Total Price : Rs. " + Utility.round(emailContent.getTotalPrice(), 2)
 				+ "</h4> </br>";
-		emailbody += "<h3>Total Paid  : Rs. " + emailContent.getTotalPaid()
+		emailbody += "<h3>Total Paid  : Rs. " + Utility.round(emailContent.getTotalPaid(), 2)
 				+ "</h4> </br>";
 		emailbody += "<h3>Returned    : Rs. "
-				+ (emailContent.getTotalPaid() - emailContent.getTotalPrice())
+				+ Math.abs(Utility.round((emailContent.getTotalPaid() - emailContent.getTotalPrice()), 2))
 				+ "</h4> </br>";
 		emailbody += "</br></br>";
 		emailbody += "<h4>Thank you for shopping with us</h4>";

@@ -25,6 +25,5 @@ public class InzaanaPosServiceConfig extends ResourceConfig {
 		{
 			throw new WebApplicationException(response.getMessage(), response.getStatusCode());
 		}
-		
 	}
 }
